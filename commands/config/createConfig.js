@@ -1,6 +1,6 @@
 const axios = require('axios');
-const validateRole = require("./validateRole");
-const validateChannel = require("./validateChannel");
+const validateRole = require('./validateRole');
+const validateChannel = require('./validateChannel');
 
 module.exports = async (message) => {
 
@@ -11,23 +11,23 @@ module.exports = async (message) => {
   }
 
   // 2. CHECK IF GUILD CONFIG ALREADY EXISTS
-  let guild;
+  let res;
   try {
-    guild = await axios({
+    res = await axios({
       method: 'GET',
       url: `http://localhost:3000/api/v1/guilds/discord/${message.channel.guild.id}`
     });
+
+    // if API call doesn't return err = guild exists
+    message.channel.send("Config for your guild already exists. Try ?config edit to update it."); // TODO: "would you like to modify it? yes/no"
+    return;
+
   } catch (err) {
     if (err.response.status !== 404) {
       message.channel.send("There was a problem with your request. Please, try again later.");
       console.log(err);
       return;
     };
-  };
-
-  if (guild) {
-    message.channel.send("Config for your guild already exists. Try ?config edit to update it."); // TODO: "would you like to modify it? yes/no"
-    return;
   };
 
   // 3. ASK FOR PARAMS

@@ -1,7 +1,7 @@
-const config = require("../../config.json")
+const config = require('../../config.json');
 
 module.exports = async (message, errMessage) => {
-  let response = ""
+  let response = "";
 
   const filter = m => m.author.id === message.author.id;
   await message.channel.awaitMessages(filter, { max: 1, time: 30000 })

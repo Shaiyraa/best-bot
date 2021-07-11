@@ -1,5 +1,5 @@
-const Discord = require("discord.js");
-const fs = require("fs");
+const Discord = require('discord.js');
+const fs = require('fs');
 const createConfig = require('./createConfig');
 const sendEmbedMessage = require('../../utils/sendEmbedMessage');
 
