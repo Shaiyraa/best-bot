@@ -1,10 +1,10 @@
 const Discord = require('discord.js');
+const axios = require('axios');
 const config = require('../../config.json');
 const validateContent = require('./validateContent');
 const validateResponseRegex = require('../../utils/validateResponseRegex');
 const validateResponse = require('../../utils/validateResponse');
 const isGuildInDB = require('../../utils/isGuildInDB');
-const { default: axios } = require('axios');
 const updateEventMessage = require('../../utils/updateEventMessage');
 
 module.exports = async (message, date) => {
@@ -107,7 +107,8 @@ module.exports = async (message, date) => {
     .addField("Date:", date.toLocaleDateString("en-GB"), true)
     .addField("Time:", hour, true)
     .addField("Details:", content, false)
-    .addField("UNDECIDED:", 'null', false)
+    .addField("CAN\'T:", 'empty', false)
+    .addField("UNDECIDED:", 'empty', false)
     .addField("Signed up:", `0/0`, true)
     .addField("Can\'t:", `0/0`, true)
     .addField("Undecided:", `0/0`, true)
@@ -130,18 +131,14 @@ module.exports = async (message, date) => {
   // a) axios call to save event
   let res
   try {
-    res = await axios({
-      method: 'POST',
-      url: 'http://localhost:3000/api/v1/events',
-      data: {
-        date,
-        type,
-        mandatory,
-        alerts,
-        content,
-        guild: guildConfig._id,
-        messageId
-      }
+    res = await axios.post('http://localhost:3000/api/v1/events', {
+      date,
+      type,
+      mandatory,
+      alerts,
+      content,
+      guild: guildConfig._id,
+      messageId
     });
   } catch (err) {
     message.channel.send("There was a problem with your request. Please, try again later.");
@@ -182,8 +179,8 @@ module.exports = async (message, date) => {
           user.send("There was a problem with your request. Please, try again later.");
         }
         console.log(err);
-      }
-    }
+      };
+    };
 
     switch (reaction.emoji.name) {
       case config.yesEmoji: {
@@ -205,12 +202,8 @@ module.exports = async (message, date) => {
   // 9. INFORM THAT EVENT WAS CREATED
   const eventCreatedEmbed = new Discord.MessageEmbed()
     .setTitle("Event has been created")
-    .setDescription(`[Link to the event post](${reactionMessage.url})`)
-  message.channel.send(eventCreatedEmbed)
+    .setDescription(`[Link to the event post](${reactionMessage.url})`);
+
+  message.channel.send(eventCreatedEmbed);
 
 };
-
-
-/*
-TODO:
-*/

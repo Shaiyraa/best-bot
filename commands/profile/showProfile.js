@@ -1,3 +1,4 @@
+const Discord = require('discord.js');
 const axios = require('axios');
 const isGuildInDB = require('../../utils/isGuildInDB');
 
@@ -52,5 +53,16 @@ module.exports = async (message, familyName) => {
   }
   const user = res.data.data.users[0];
 
-  message.channel.send(`This command is not fully supported yet, but here's your family name: ${user.familyName}`); // TODO: send embed with more info 
+  const embed = new Discord.MessageEmbed()
+    .setDescription(`Profile of **${user.familyName}**:`)
+    .addField("AP:", user.regularAp, true)
+    .addField("AAP:", user.awakeningAp, true)
+    .addField("DP:", user.dp, true)
+    .addField("Class:", `${user.stance} ${user.characterClass}`, true)
+    .addField("Level:", `99`, false)
+    .addField("Nodewar Group:", user.group.name, true)
+    .addField("Proof:", `[Link](https://i.imgur.com/RewZtoA.jpg)`, true)
+  //.setColor("#58de49");
+
+  message.channel.send(embed)
 }

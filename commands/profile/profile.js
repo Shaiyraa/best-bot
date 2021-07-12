@@ -1,6 +1,8 @@
+const Discord = require('discord.js');
 const createProfile = require("./createProfile");
 const showProfile = require("./showProfile");
 const editProfile = require("./editProfile");
+const listProfiles = require("./listProfiles");
 const sendEmbedMessage = require("../../utils/sendEmbedMessage");
 
 module.exports.run = async (bot, message, args) => {
@@ -12,6 +14,10 @@ module.exports.run = async (bot, message, args) => {
     };
     case "show": {
       showProfile(message, args[1]);
+      break;
+    };
+    case "list": {
+      await listProfiles(message);
       break;
     };
     case "edit": {

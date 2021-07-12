@@ -11,7 +11,6 @@ module.exports = async (res, eventMessage) => {
   let undecidedMembersList = event.undecidedMembers.map(member => member.familyName);
   undecidedMembersList.length ? undecidedMembersList = undecidedMembersList.join(", ") : undecidedMembersList = "good job! no slackers on this event";
 
-
   // 3a. Create new embed object
   const embed = {
     color: event.mandatory ? "#ff0000" : "#58de49",
@@ -33,8 +32,7 @@ module.exports = async (res, eventMessage) => {
     },
     {
       name: "Details",
-      value: event.content,
-      inline: true,
+      value: event.content
     }]
   };
 
@@ -70,8 +68,15 @@ module.exports = async (res, eventMessage) => {
 
   };
   groupFields.map(field => {
-    groupObj[field.name] ? field.value = groupObj[field.name].join(", ") : field.value = "empty"
+    groupObj[field.name] ? field.value = `\`\`\`${groupObj[field.name].join(", ")}\`\`\`` : field.value = "```empty```"
   });
+
+  let noMembersList = "empty"
+  if (event.noMembers.length) {
+    noMembersList = event.noMembers.map(member => member.familyName).join(", ")
+  }
+
+  groupFields.push({ name: "CAN\'T", value: noMembersList });
 
   groupFields.push({ name: "UNDECIDED", value: undecidedMembersList });
 
@@ -85,83 +90,3 @@ module.exports = async (res, eventMessage) => {
   await eventMessage.edit({ embed });
 
 };
-
-
-
-/*
-
-  // 3a. Create new embed object
-  const embed = {
-    color: event.mandatory ? "#ff0000" : "#58de49",
-    description: event.mandatory ? "Mandatory" : "Non-mandatory",
-    fields: [{
-      name: "Event",
-      value: event.type,
-      inline: false,
-    },
-    {
-      name: "Date",
-      value: new Date(event.date).toLocaleDateString("en-GB"),
-      inline: true,
-    },
-    {
-      name: "Time",
-      value: event.hour,
-      inline: true,
-    },
-    {
-      name: "Details",
-      value: event.content,
-      inline: true,
-    }]
-  };
-
-  // 3b. Define signup fields
-  const signupFields = [{
-    name: "Signed up:",
-    value: `${event.yesMembers.length}/${totalMemberCount}`,
-    inline: true,
-  },
-  {
-    name: "Can\'t:",
-    value: `${event.noMembers.length}/${totalMemberCount}`,
-    inline: true,
-  },
-  {
-    name: "Undecided:",
-    value: `${event.undecidedMembers.length}/${totalMemberCount}`,
-    inline: true,
-  }];
-
-  // 3c. Define group fields          // TODO: make it more efficient
-  const groupFields = [];
-
-  if (event.yesMembers.length) {
-    // loop through yesMembers to see what groups to display
-    let groupNames = []; // only to keep track of the groups
-    event.yesMembers.forEach(member => {
-      if (!groupNames.includes(member.group)) {
-        groupNames.push(member.group);
-        groupFields.push({ name: member.group, value: [] });
-      };
-
-      // push user's name to value array
-      groupFields.map(group => {
-        if (group.name === member.group) {
-          group.value.push(member.familyName);
-        };
-      });
-    });
-
-    groupFields.map(group => {
-      group.value = group.value.join(', ');
-    });
-  };
-
-  groupFields.push({ name: "UNDECIDED", value: undecidedMembersList });
-
-  // concat the arrays and put swap embed fields
-  let arr = [];
-  embed.fields = arr.concat(embed.fields, groupFields, signupFields);
-
- */
