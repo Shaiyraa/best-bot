@@ -23,15 +23,13 @@ module.exports = async (message) => {
 
   const users = res.data.data.users
 
-  const familyNames = users.map(user => user.familyName)
-  const gs = users.map(user => 650) // TODO: count GS in virtual property in db
-  const characterClasses = users.map(user => user.characterClass)
+  const membersInfo = users.map(user => `${user.familyName} 650GS <${user.characterClass}>`)
+  membersInfo.join('\n')
 
   const embed = new Discord.MessageEmbed()
-    .setTitle("All user profiles:")
-    .addField("Family Name", familyNames, true)
-    .addField("GS", gs, true)
-    .addField("Class", characterClasses, true)
-
+    .addField("All user profiles:", membersInfo)
   message.channel.send(embed);
+
+
+  // TODO: fix this shit
 };

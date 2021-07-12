@@ -2,14 +2,16 @@ const Discord = require("discord.js");
 const fs = require("fs");
 const dotenv = require('dotenv');
 dotenv.config({ path: './config.env' })
+
+const setEventListeners = require('./setEventListeners');
 const config = require("./config.json");
 
 // create bot
 const bot = new Discord.Client({ disableEveryone: true });
 
-bot.on("ready", () => {
+bot.on("ready", async () => {
   bot.user.setActivity('type ?help', { type: 'PLAYING' })
-  //setEventListerens(bot).catch(console.log)
+  await setEventListeners(bot).catch(console.log)
 })
 
 // create commands

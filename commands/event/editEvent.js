@@ -96,7 +96,7 @@ module.exports = async (message, guildConfig, event) => {
     return
   }
 
-  await updateEventMessage(res, eventMessage)
+  await updateEventMessage(res.data.data.event, eventMessage)
   message.channel.send("Event updated successfully!")
 };
 

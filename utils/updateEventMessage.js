@@ -1,9 +1,6 @@
 const Discord = require('discord.js');
 
-module.exports = async (res, eventMessage) => {
-
-  // 1. Get event data from axios response
-  const event = res.data.data.event;
+module.exports = async (event, eventMessage) => {
 
   // 2. Get additional required data
   const totalMemberCount = event.undecidedMembers.length + event.yesMembers.length + event.noMembers.length;
@@ -11,10 +8,18 @@ module.exports = async (res, eventMessage) => {
   let undecidedMembersList = event.undecidedMembers.map(member => member.familyName);
   undecidedMembersList.length ? undecidedMembersList = undecidedMembersList.join(", ") : undecidedMembersList = "good job! no slackers on this event";
 
+  let signupStatus = "CLOSED";
+  if ((new Date(event.date).getTime() - new Date(Date.now()).getTime()) > 1.5 * 60 * 60 * 1000 && event.maxCount > event.yesMembers.length) {
+    signupStatus = "OPEN";
+  }
+
   // 3a. Create new embed object
   const embed = {
     color: event.mandatory ? "#ff0000" : "#58de49",
     description: event.mandatory ? "Mandatory" : "Non-mandatory",
+    footer: {
+      text: `Signups ${signupStatus}`
+    },
     fields: [{
       name: "Event",
       value: event.type,
@@ -29,6 +34,11 @@ module.exports = async (res, eventMessage) => {
       name: "Time",
       value: event.hour,
       inline: true,
+    },
+    {
+      name: "Max. Attendance",
+      value: event.maxCount,
+      inline: false,
     },
     {
       name: "Details",
@@ -63,10 +73,8 @@ module.exports = async (res, eventMessage) => {
       if (!groupObj[member.group.name]) groupObj[member.group.name] = []
       groupObj[member.group.name].push(member.familyName)
     })
-    console.log(groupObj)
-
-
   };
+
   groupFields.map(field => {
     groupObj[field.name] ? field.value = `\`\`\`${groupObj[field.name].join(", ")}\`\`\`` : field.value = "```empty```"
   });
@@ -83,8 +91,6 @@ module.exports = async (res, eventMessage) => {
   // concat the arrays and put swap embed fields
   let arr = [];
   embed.fields = arr.concat(embed.fields, groupFields, signupFields);
-
-  console.log(embed)
 
   // 4. Update embed with new event data
   await eventMessage.edit({ embed });

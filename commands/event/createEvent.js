@@ -15,6 +15,7 @@ module.exports = async (message, date) => {
 
   let hour;
   let type;
+  let count;
   let alerts;
   let mandatory;
 
@@ -29,6 +30,7 @@ module.exports = async (message, date) => {
     // TODO: check if already exists
 
     type = "nodewar"
+    count = 100
     alerts = false
     mandatory = true
   } else {
@@ -50,12 +52,20 @@ module.exports = async (message, date) => {
 
     // set proper date
     date = new Date(date.split(/\D/g)[2], date.split(/\D/g)[1] - 1, date.split(/\D/g)[0], hour.split(":")[0], hour.split(":")[1]);
+
     // TODO: check limit
     // TODO: check if already exists
 
     message.channel.send('What is the type of the event? Possible types: "nodewar", "siege", "guildevent".');
     type = await validateResponse(message, "Invalid response (nodewar, siege, guildevent)", ['nodewar', 'siege', 'guildevent']);
     if (type === "exit") {
+      message.channel.send("Bye!");
+      return;
+    }
+
+    message.channel.send('What is the max amount of people (1-100)?');
+    count = await validateResponseRegex(message, "Invalid number.", /^[1-9][0-9]?$|^100$/g);
+    if (count === "exit") {
       message.channel.send("Bye!");
       return;
     }
@@ -83,6 +93,12 @@ module.exports = async (message, date) => {
       alerts = false
   };
 
+  // TODO: put it into the function checking date instead
+  if (date < Date.now()) {
+    message.channel.send("Can't create event with past date. Try again.");
+    return;
+  }
+
   // 3. SET MESSAGE CONTENT
   let content = "no description";
   message.channel.send("Do you want to create a custom message (yes/no)?");
@@ -106,13 +122,15 @@ module.exports = async (message, date) => {
     .setDescription(mandatory ? "Mandatory" : "Non-mandatory")
     .addField("Date:", date.toLocaleDateString("en-GB"), true)
     .addField("Time:", hour, true)
+    .addField("Max. Attendance:", count, false)
     .addField("Details:", content, false)
     .addField("CAN\'T:", 'empty', false)
     .addField("UNDECIDED:", 'empty', false)
     .addField("Signed up:", `0/0`, true)
     .addField("Can\'t:", `0/0`, true)
     .addField("Undecided:", `0/0`, true)
-    .setColor(mandatory ? "#ff0000" : "#58de49");
+    .setColor(mandatory ? "#ff0000" : "#58de49")
+    .setFooter("Signups CLOSED");
 
 
   // 5. CREATE ICONS
@@ -134,6 +152,7 @@ module.exports = async (message, date) => {
     res = await axios.post('http://localhost:3000/api/v1/events', {
       date,
       type,
+      maxCount: count,
       mandatory,
       alerts,
       content,
@@ -149,13 +168,12 @@ module.exports = async (message, date) => {
   const event = res.data.data.event;
 
   // 7. UPDATE MESSAGE WITH REAL DATA
-  await updateEventMessage(res, reactionMessage);
-
+  await updateEventMessage(event, reactionMessage);
 
   // 8. CREATE LISTENER
   const filter = (reaction, user) => {
     if (!emojis.includes(reaction.emoji.name)) {
-      let reactionMap = eventMessage.reactions.resolve(reaction.emoji.name);
+      let reactionMap = reactionMessage.reactions.resolve(reaction.emoji.id) || eventMessage.reactions.resolve(reaction.emoji.name);
       reactionMap?.users.remove(user.id);
     }
     return emojis.includes(reaction.emoji.name);
@@ -172,13 +190,18 @@ module.exports = async (message, date) => {
           goToGroup
         });
 
-        await updateEventMessage(res, reactionMessage);
+        await updateEventMessage(res.data.data.event, reactionMessage);
 
       } catch (err) {
+        console.log(err);
+
+        if (err.response.status === 403) {
+          user.send(err.response.data.message);
+          return
+        }
         if (err.response.status !== 400) {
           user.send("There was a problem with your request. Please, try again later.");
         }
-        console.log(err);
       };
     };
 
