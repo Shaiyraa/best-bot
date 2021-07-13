@@ -3,15 +3,10 @@ const axios = require('axios');
 const config = require('../../config.json');
 const deleteEvent = require('./deleteEvent');
 const editEvent = require('./editEvent');
-const isGuildInDB = require('../../utils/isGuildInDB');
 
-module.exports = async (message, argDate) => {
+module.exports = async (message, guildConfig, argDate) => {
 
-  // 1. CHECK IF GUILD IS IN DB
-  const guildConfig = await isGuildInDB(message);
-  if (!guildConfig) return;
-
-  // 2. GET ALL THE EVENTS FOR THIS GUILD
+  // 1. GET ALL THE EVENTS FOR THIS GUILD
   let res;
   try {
     res = await axios.get("http://localhost:3000/api/v1/events", {
@@ -19,14 +14,13 @@ module.exports = async (message, argDate) => {
     });
   } catch (err) {
     console.log(err);
-    message.channel.send("There was a problem with your request. Please, try again later.");
-    return;
+    return message.channel.send("There was a problem with your request. Please, try again later.");
   };
 
   const events = res.data.data.events;
-
   if (!events.length) return message.channel.send("There are no scheduled events.");
-  // 3. CREATE A MESSAGE AND LISTENER FOR EACH EVENT
+
+  // 2. CREATE A MESSAGE AND LISTENER FOR EACH EVENT
   events.forEach(async event => {
     const totalMemberCount = event.undecidedMembers.length + event.yesMembers.length + event.noMembers.length;
 
@@ -42,11 +36,10 @@ module.exports = async (message, argDate) => {
       .setColor(event.mandatory ? "#ff0000" : "#58de49");
 
     // send message
-    const reactionMessage = await message.channel.send(embed)
+    const reactionMessage = await message.channel.send(embed);
 
     // set emojis
     let emojis = [config.editEmoji, config.deleteEmoji];
-
     await reactionMessage.react(config.editEmoji);
     await reactionMessage.react(config.deleteEmoji);
 
@@ -72,5 +65,5 @@ module.exports = async (message, argDate) => {
         };
       };
     });
-  })
+  });
 };

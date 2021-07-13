@@ -1,6 +1,6 @@
 const axios = require('axios');
-const validateRole = require('./validateRole');
-const validateChannel = require('./validateChannel');
+const validateRole = require('../../utils/validators/validateRole');
+const validateChannel = require('../../utils/validators/validateChannel');
 
 module.exports = async (message) => {
 

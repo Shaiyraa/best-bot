@@ -1,17 +1,14 @@
 const Discord = require('discord.js');
 const axios = require('axios');
 const config = require('../../config.json');
-const validateContent = require('./validateContent');
-const validateResponseRegex = require('../../utils/validateResponseRegex');
-const validateResponse = require('../../utils/validateResponse');
-const isGuildInDB = require('../../utils/isGuildInDB');
+
 const updateEventMessage = require('../../utils/updateEventMessage');
 
-module.exports = async (message, date) => {
+const validateContent = require('../../utils/validators/validateContent');
+const validateResponseRegex = require('../../utils/validators/validateResponseRegex');
+const validateResponse = require('../../utils/validators/validateResponse');
 
-  // 1. CHECK IF GUILD IS IN DB
-  const guildConfig = await isGuildInDB(message);
-  if (!guildConfig) return;
+module.exports = async (message, guildConfig, date) => {
 
   let hour;
   let type;
@@ -21,18 +18,15 @@ module.exports = async (message, date) => {
 
   // 2a. DATE EXISTS - QUICK SETUP OF PARAMS
   if (date) {
-    // set proper date
+
     hour = "20:00"
+    // set proper date
     date = new Date(date.split(/\D/g)[2], date.split(/\D/g)[1] - 1, date.split(/\D/g)[0], hour.split(":")[0], hour.split(":")[1]);
-    //console.log(date.toLocaleString("en-GB"))
-
-    // TODO: check limit
-    // TODO: check if already exists
-
     type = "nodewar"
     count = 100
     alerts = false
     mandatory = true
+
   } else {
     // 2b. DATE DOESN'T EXIST - ASK FOR PARAMS
 
@@ -41,41 +35,39 @@ module.exports = async (message, date) => {
     if (date === "exit") {
       message.channel.send("Bye!");
       return;
-    }
+    };
 
     message.channel.send('What time is the event?');
     hour = await validateResponseRegex(message, "Invalid time.", /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/g);
     if (hour === "exit") {
       message.channel.send("Bye!");
       return;
-    }
+    };
 
     // set proper date
     date = new Date(date.split(/\D/g)[2], date.split(/\D/g)[1] - 1, date.split(/\D/g)[0], hour.split(":")[0], hour.split(":")[1]);
-
-    // TODO: check limit
-    // TODO: check if already exists
 
     message.channel.send('What is the type of the event? Possible types: "nodewar", "siege", "guildevent".');
     type = await validateResponse(message, "Invalid response (nodewar, siege, guildevent)", ['nodewar', 'siege', 'guildevent']);
     if (type === "exit") {
       message.channel.send("Bye!");
       return;
-    }
+    };
 
     message.channel.send('What is the max amount of people (1-100)?');
     count = await validateResponseRegex(message, "Invalid number.", /^[1-9][0-9]?$|^100$/g);
     if (count === "exit") {
       message.channel.send("Bye!");
       return;
-    }
+    };
 
     message.channel.send("Is the event mandatory (yes/no)?");
     mandatory = await validateResponse(message, "Invalid answer (yes/no).", ["yes", "no"]);
     if (mandatory === "exit") {
       message.channel.send("Bye!");
       return;
-    }
+    };
+
     mandatory === "yes" ?
       mandatory = true
       :
@@ -86,7 +78,8 @@ module.exports = async (message, date) => {
     if (alerts === "exit") {
       message.channel.send("Bye!");
       return;
-    }
+    };
+
     alerts === "yes" ?
       alerts = true
       :
@@ -97,7 +90,7 @@ module.exports = async (message, date) => {
   if (date < Date.now()) {
     message.channel.send("Can't create event with past date. Try again.");
     return;
-  }
+  };
 
   // 3. SET MESSAGE CONTENT
   let content = "no description";
@@ -110,8 +103,8 @@ module.exports = async (message, date) => {
       return;
     }
     case "yes": {
-      message.channel.send("Type in the content (max. 1024 characters allowed):")
-      content = await validateContent(message)
+      message.channel.send("Type in the content (max. 1024 characters allowed):");
+      content = await validateContent(message);
       break;
     };
   };
@@ -147,7 +140,7 @@ module.exports = async (message, date) => {
 
   // 6. ADD EVENT TO DB
   // a) axios call to save event
-  let res
+  let res;
   try {
     res = await axios.post('http://localhost:3000/api/v1/events', {
       date,
@@ -163,7 +156,7 @@ module.exports = async (message, date) => {
     message.channel.send("There was a problem with your request. Please, try again later.");
     console.log(err);
     return;
-  }
+  };
 
   const event = res.data.data.event;
 
@@ -175,9 +168,9 @@ module.exports = async (message, date) => {
     if (!emojis.includes(reaction.emoji.name)) {
       let reactionMap = reactionMessage.reactions.resolve(reaction.emoji.id) || reactionMessage.reactions.resolve(reaction.emoji.name);
       reactionMap?.users.remove(user.id);
-    }
+    };
     return emojis.includes(reaction.emoji.name);
-  }
+  };
 
   const collector = reactionMessage.createReactionCollector(filter, { dispose: true });
   collector.on('collect', async (reaction, user) => {
@@ -194,14 +187,7 @@ module.exports = async (message, date) => {
 
       } catch (err) {
         console.log(err);
-
-        if (err.response.status === 403) {
-          user.send(err.response.data.message);
-          return
-        }
-        if (err.response.status !== 400) {
-          user.send("There was a problem with your request. Please, try again later.");
-        }
+        return user.send(err.response.data.message);
       };
     };
 
@@ -228,5 +214,4 @@ module.exports = async (message, date) => {
     .setDescription(`[Link to the event post](${reactionMessage.url})`);
 
   message.channel.send(eventCreatedEmbed);
-
 };

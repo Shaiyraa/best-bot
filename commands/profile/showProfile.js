@@ -2,11 +2,7 @@ const Discord = require('discord.js');
 const axios = require('axios');
 const isGuildInDB = require('../../utils/isGuildInDB');
 
-module.exports = async (message, familyName) => {
-
-  // 1. CHECK IF CONFIG EXPISTS
-  const guildConfig = await isGuildInDB(message)
-  if (!guildConfig) return;
+module.exports = async (message, guildConfig, familyName) => {
 
   // if family doesn't exist, request user object by discord id first
   if (!familyName) {
@@ -20,10 +16,9 @@ module.exports = async (message, familyName) => {
         }
       });
     } catch (err) {
-      message.channel.send("There was a problem with your request. Please, try again later.");
       console.log(err);
-      return;
-    }
+      return message.channel.send("There was a problem with your request. Please, try again later.");
+    };
 
     familyName = res.data.data.user.familyName;
   }
@@ -40,29 +35,28 @@ module.exports = async (message, familyName) => {
     });
 
   } catch (err) {
-
-    if (err.response.status === 404) {
-      message.channel.send("This profile doesn't exist.");
-      return;
-    }
-
-    message.channel.send("There was a problem with your request. Please, try again later.");
+    if (err.response.status === 404) return message.channel.send("This profile doesn't exist.");
     console.log(err);
-    return;
-
+    return message.channel.send("There was a problem with your request. Please, try again later.");
   }
+
   const user = res.data.data.users[0];
 
-  const embed = new Discord.MessageEmbed()
-    .setDescription(`Profile of **${user.familyName}**:`)
-    .addField("AP:", user.regularAp, true)
-    .addField("AAP:", user.awakeningAp, true)
-    .addField("DP:", user.dp, true)
-    .addField("Class:", `${user.stance} ${user.characterClass}`, true)
-    .addField("Level:", `99`, false)
-    .addField("Nodewar Group:", `${user.group ? user.group.name : "DEFAULT"}`, true)
-    .addField("Proof:", `[Link](https://media.tenor.com/images/a1505c6e6d37aa2b7c5953741c0177dc/tenor.gif)`, true)
+  const embed = new Discord.MessageEmbed().setDescription(`Profile of **${user.familyName}**:`);
+
+  if (!user.private) {
+    embed.addField("AP:", user.regularAp, true)
+      .addField("AAP:", user.awakeningAp, true)
+      .addField("DP:", user.dp, true)
+      .addField("Level:", `99`, true)
+      .addField("Proof:", `[Link](https://media.tenor.com/images/a1505c6e6d37aa2b7c5953741c0177dc/tenor.gif)`, true);
+  } else {
+    embed.setFooter("Profile set to private");
+  };
+
+  embed.addField("Class:", `${user.characterClass === "shai" ? "" : user.stance} ${user.characterClass}`, false)
+    .addField("Nodewar Group:", `${user.group ? user.group.name : "DEFAULT"}`, true);
   //.setColor("#58de49");
 
-  message.channel.send(embed)
-}
+  message.channel.send(embed);
+};

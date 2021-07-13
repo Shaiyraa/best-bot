@@ -1,102 +1,80 @@
 const axios = require('axios');
-const validateContent = require("./validateContent")
-const validateResponse = require("../../utils/validateResponse")
-const validateResponseRegex = require("../../utils/validateResponseRegex")
-const updateEventMessage = require("../../utils/updateEventMessage")
+const updateEventMessage = require("../../utils/updateEventMessage");
+const validateContent = require("../../utils/validators/validateContent");
+const validateResponse = require("../../utils/validators/validateResponse");
+const validateResponseRegex = require("../../utils/validators/validateResponseRegex");
 
 module.exports = async (message, guildConfig, event) => {
 
-  // 1. SET NEW VALUES
-  let newType = event.type
-  let newMandatory = event.mandatory
-  let newAlerts = event.alerts
-  let newContent = event.content
-
-  // type
-  message.channel.send('What is the type of the event? Possible types: "nodewar", "siege", "guildevent". Type "next", to skip and leave previous value.');
-  let typeAnswer = await validateResponse(message, "Invalid response (nodewar, siege, guildevent)", ["nodewar", "siege", "guildevent", "next"]);
-  if (typeAnswer === "exit") {
+  // ask for param
+  message.channel.send('What do you want to update (type, mandatory, alerts, description)?');
+  let param = await validateResponse(message, "Invalid response (options: type, mandatory, alerts, description)", ["type", "mandatory", "alerts", "description"]);
+  if (param === "exit") {
     message.channel.send("Bye!");
     return;
-  }
-  if (typeAnswer !== "next") newType = typeAnswer
-
-
-  // mandatory
-  message.channel.send('Is the event mandatory (yes/no)? Type "next", to skip and leave previous value.');
-  mandatoryAnswer = await validateResponse(message, "Invalid answer (yes/no).", ["yes", "no", "next"]);
-  if (mandatoryAnswer === "exit") {
-    message.channel.send("Bye!");
-    return;
-  }
-  if (alertsAnswer !== "next") {
-    mandatoryAnswer === "yes" ?
-      newMandatory = true
-      :
-      newMandatory = false
-  }
-
-  // alerts
-  message.channel.send('Do you want to enable automatic alerts (yes/no)? Type "next", to skip and leave previous value.');
-  alertsAnswer = await validateResponse(message, "Invalid answer (yes/no).", ["yes", "no", "next"]);
-  if (alertsAnswer === "exit") {
-    message.channel.send("Bye!");
-    return;
-  }
-  if (alertsAnswer !== "next") {
-    alertsAnswer === "yes" ?
-      newAlerts = true
-      :
-      newAlerts = false
   };
 
-  // content
-  message.channel.send('Do you want to create a custom message (yes/no)? Type "next", to skip and leave previous value.');
-  const contentResponse = await validateResponse(message, "Invalid answer (Valid options: yes/no).", ["yes", "no", "next"]);
+  // ask for value
+  let value;
+  switch (param) {
+    case "type": {
+      message.channel.send(`What is the type of the event? Current type: ${event.type}. Possible types: "nodewar", "siege", "guildevent"`);
+      value = await validateResponse(message, "Invalid response (nodewar, siege, guildevent)", ["nodewar", "siege", "guildevent"]);
+      if (value === "exit") {
+        message.channel.send("Bye!");
+        return;
+      };
 
-  switch (contentResponse) {
-    case "exit": {
-      message.channel.send("Bye!");
-      return;
-    }
-    case "next": {
-      break;
-    }
-    case "yes": {
-      message.channel.send("Type in the content (max. 1024 characters allowed):")
-      newContent = await validateContent(message)
       break;
     };
-    default: {
-      newContent = "no description";
-    }
+    case "mandatory": {
+      value = !event.mandatory;
+
+      break;
+    };
+    case "alerts": {
+      value = !event.alerts;
+
+      break;
+    };
+    case "description": {
+      message.channel.send('Do you want to create a custom message (yes/no)? Type "next", to skip and leave previous value.');
+      const contentResponse = await validateResponse(message, "Invalid answer (Valid options: yes/no).", ["yes", "no"]);
+
+      switch (contentResponse) {
+        case "exit": {
+          return message.channel.send("Bye!");
+        };
+        case "yes": {
+          message.channel.send("Type in the content (max. 1024 characters allowed):");
+          value = await validateContent(message);
+          break;
+        };
+        default: {
+          value = "no description";
+        };
+      };
+
+      break;
+    };
   }
 
   // 2. CALL API
 
   let res;
   try {
-    res = await axios.patch(`http://localhost:3000/api/v1/events/${event._id}`, {
-      type: newType,
-      mandatory: newMandatory,
-      alerts: newAlerts,
-      content: newContent
-    });
+    res = await axios.patch(`http://localhost:3000/api/v1/events/${event._id}?${param}=${value}`);
   } catch (err) {
-    message.channel.send("There was a problem with your request. Please, try again later.");
     console.log(err);
-    return
-  }
+    return message.channel.send("There was a problem with your request. Please, try again later.");
+  };
 
   // 3. UPDATE MESSAGE
-  const channel = await message.guild.channels.resolve(guildConfig.announcementsChannel)
-  let eventMessage = await channel.messages.fetch(event.messageId)
-  if (!eventMessage) {
-    message.channel.send("There was a problem with your request, as event message no longer exists.")
-    return
-  }
+  const channel = await message.guild.channels.resolve(guildConfig.announcementsChannel);
+  let eventMessage = await channel.messages.fetch(event.messageId);
+  if (!eventMessage) return message.channel.send("There was a problem with your request, as event message no longer exists.");
 
-  await updateEventMessage(res.data.data.event, eventMessage)
-  message.channel.send("Event updated successfully!")
+  await updateEventMessage(res.data.data.event, eventMessage);
+  message.channel.send("Event updated successfully!");
 };
 

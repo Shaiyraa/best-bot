@@ -14,5 +14,34 @@
   "attendanceEmoji": "🧑‍🤝‍🧑",
   "mandatoryEmoji": "❕",
   "alertsEmoji": "📢",
-  "contentEmoji": "📰"
+  "contentEmoji": "📰",
+  "classes": [
+    "archer",
+    "berserker",
+    "dark knight",
+    "guardian",
+    "hashashin",
+    "kunoichi",
+    "lahn",
+    "maehwa",
+    "musa",
+    "mystic",
+    "ninja",
+    "nova",
+    "ranger",
+    "sage",
+    "shai",
+    "sorceress",
+    "striker",
+    "tamer",
+    "valkyrie",
+    "warrior",
+    "witch",
+    "wizard",
+    "corsair"
+  ],
+  "stance": [
+    "awakening",
+    "succession"
+  ]
 }

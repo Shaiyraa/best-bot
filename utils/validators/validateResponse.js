@@ -1,7 +1,7 @@
 const Discord = require("discord.js");
-const config = require("../config.json");
+const config = require("../../config.json");
 
-const validateResponseRegex = async (message, errMessage, conditions) => {
+const validateResponse = async (message, errMessage, conditions) => {
   let response = "";
 
   const filter = m => m.author.id === message.author.id;
@@ -14,17 +14,16 @@ const validateResponseRegex = async (message, errMessage, conditions) => {
       response = m.content
     })
     .catch((err) => {
-      response = "exit";
-      console.log(err);
+      response = "exit"
+      console.log(err)
     });
 
-  if (response.match(conditions) || response === "exit") {
+  if (conditions.includes(response) || response === "exit") {
     return response;
   };
 
   message.channel.send(errMessage);
-  return await validateResponseRegex(message, errMessage, conditions);
+  return await validateResponse(message, errMessage, conditions);
 };
 
-
-module.exports = validateResponseRegex;
+module.exports = validateResponse;

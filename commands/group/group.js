@@ -1,40 +1,54 @@
 const Discord = require('discord.js');
 const createGroup = require('./createGroup');
-const assignGroup = require('./assignGroup');
+const listGroups = require('./listGroups');
+const editGroup = require('./editGroup');
 const deleteGroup = require('./deleteGroup');
+const assignGroup = require('./assignGroup');
+
 const sendEmbedMessage = require('../../utils/sendEmbedMessage');
+const isGuildInDB = require('../../utils/isGuildInDB');
 
 module.exports.run = async (bot, message, args) => {
+
+  // 1. CHECK IF GUILD IS IN DB
+  const guildConfig = await isGuildInDB(message);
+  if (!guildConfig) return;
+
   switch (args[0]) {
     case "create": {
-      createGroup(message, args[1]);
+      createGroup(message, guildConfig, args[1]);
+      break;
+    };
+    case "list": {
+      listGroups(message, guildConfig)
       break;
     };
     case "edit": {
-      message.channel.send("code it ffs");
-      break;
-    };
-    case "assign": {
-      assignGroup(message, args[1], args[2]);
+      editGroup(message, guildConfig)
       break;
     };
     case "delete": {
-      deleteGroup(message, args[1]);
+      deleteGroup(message, guildConfig, args[1]);
+      break;
+    };
+    case "assign": {
+      assignGroup(message, guildConfig, args[1], args[2]);
       break;
     };
     default: {
       sendEmbedMessage(message.channel, "Options:", [
         "?group create - to create new group",
+        "?group edit - to edit a group",
+        "?group delete - to delete a group",
         "?group list - to manage existing groups",
         "?group assign [group] [familyName] - to assign group to one guild members",
         "?group assign [group] - to assign group to many guild members"
       ]);
     };
   };
-
 };
 
 module.exports.help = {
   name: "group",
-  description: "asd"
+  description: "manage nodewar groups"
 };

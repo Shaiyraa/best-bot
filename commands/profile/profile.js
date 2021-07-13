@@ -1,34 +1,46 @@
 const Discord = require('discord.js');
 const createProfile = require("./createProfile");
 const showProfile = require("./showProfile");
-const editProfile = require("./editProfile");
 const listProfiles = require("./listProfiles");
+const editProfile = require("./editProfile");
+const togglePrivate = require("./togglePrivate");
+const isGuildInDB = require('../../utils/isGuildInDB')
 const sendEmbedMessage = require("../../utils/sendEmbedMessage");
 
 module.exports.run = async (bot, message, args) => {
 
+  // CHECK IF CONFIG EXPISTS
+  const guildConfig = await isGuildInDB(message);
+  if (!guildConfig) return;
+
   switch (args[0]) {
     case "create": {
-      createProfile(message);
+      createProfile(message, guildConfig);
       break;
     };
     case "show": {
-      showProfile(message, args[1]);
+      showProfile(message, guildConfig, args[1]);
       break;
     };
     case "list": {
-      await listProfiles(message);
+      await listProfiles(message, guildConfig);
       break;
     };
     case "edit": {
-      editProfile(message, args[1]); // ?profile edit eva 234 || if params are empty, ask what to update
+      editProfile(message, guildConfig, args[1]);
+      break;
+    };
+    case "private": {
+      togglePrivate(message, guildConfig, args[1]);
       break;
     };
     default: {
       sendEmbedMessage(message.channel, "Options:", [
         "?profile create - to create new profile",
         "?profile show [discord name / family name] - to show member's profile; use without [name] to see your own profile",
-        "?profile update - to update existing profile", "?profile delete - to delete your profile"
+        "?profile list - to display all profiles",
+        "?profile edit - to edit your profile",
+        "?profile private [true/false] - to set your profile to private/public"
       ]);
     };
   };
@@ -36,5 +48,5 @@ module.exports.run = async (bot, message, args) => {
 
 module.exports.help = {
   name: "profile",
-  description: "asd"
+  description: "display member profiles and manage your profile"
 };

@@ -1,18 +1,13 @@
 const axios = require('axios');
-const isGuildInDB = require('../../utils/isGuildInDB');
 
-module.exports = async (message, groupName) => {
+module.exports = async (message, guildConfig, groupName) => {
 
-  // 1. CHECK IF GUILD IS IN DB
-  const guildConfig = await isGuildInDB(message);
-  if (!guildConfig) return;
-
-  // 2. CHECK IF GROUP EXISTS
+  // 1. CHECK IF GROUP EXISTS
   let group = guildConfig.groups.filter(group => group.name === groupName.toUpperCase());
   if (!group.length) return message.channel.send("Wrong group name.");
-  group = group[0]
+  group = group[0];
 
-  // 3. CONFIRM DECISION
+  // 2. CONFIRM DECISION
   message.channel.send(`Are you sure that you want to delete ${group.name}? Type "yes" to confirm.`);
   const filter = m => m.author.id === message.author.id;
   await message.channel.awaitMessages(filter, { max: 1, time: 30000 })
@@ -20,21 +15,19 @@ module.exports = async (message, groupName) => {
       m = m.first();
       if (m.content.toLowerCase() === "yes") {
 
-        // 4. CALL API
+        // 3. CALL API
         let res;
         try {
-          res = await axios.delete(`http://localhost:3000/api/v1/groups/${group._id}`)
+          res = await axios.delete(`http://localhost:3000/api/v1/groups/${group._id}`);
         } catch (err) {
           message.channel.send(err.response.data.message);
           return console.log(err);
-        }
+        };
 
         message.channel.send("Group has been deleted");
-
       };
     })
     .catch((err) => {
       console.log(err);
     });
-
-}
+};

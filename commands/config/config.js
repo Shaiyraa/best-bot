@@ -1,16 +1,16 @@
-const Discord = require('discord.js');
-const fs = require('fs');
 const createConfig = require('./createConfig');
+const editConfig = require('./editConfig');
 const sendEmbedMessage = require('../../utils/sendEmbedMessage');
 
 module.exports.run = async (bot, message, args) => {
+
   switch (args[0]) {
     case "create": {
       createConfig(message);
       break;
     };
     case "edit": {
-      message.channel.send("code it ffs");
+      editConfig(message);
       break;
     };
     default: {
@@ -25,5 +25,5 @@ module.exports.run = async (bot, message, args) => {
 
 module.exports.help = {
   name: "config",
-  description: "asd"
+  description: "manage guild config options"
 };

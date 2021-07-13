@@ -1,16 +1,13 @@
 const axios = require('axios');
 const isGuildInDB = require('../../utils/isGuildInDB');
-const validateResponseRegex = require('../../utils/validateResponseRegex');
-const validateResponse = require('../../utils/validateResponse');
+const validateResponseRegex = require('../../utils/validators/validateResponseRegex');
+const validateClass = require('../../utils/validators/validateClass');
+const validateStance = require('../../utils/validators/validateStance');
 
 
-module.exports = async (message) => {
+module.exports = async (message, guildConfig) => {
 
-  // 1. CHECK IF CONFIG EXPISTS
-  const guildConfig = await isGuildInDB(message)
-  if (!guildConfig) return;
-
-  // 2. CHECK IF PROFILE ALREADY EXISTS
+  // 1. CHECK IF PROFILE ALREADY EXISTS
   let res;
   try {
     res = await axios({
@@ -22,82 +19,64 @@ module.exports = async (message) => {
     });
 
     // if API call doesn't return err = user exists
-    message.channel.send("Your profile is already created. If you want to modify it, use ?profile edit [stat you want to edit]");
-    return;
+    if (res.data.data.user) return message.channel.send("Your profile is already created. If you want to modify it, use ?profile edit [stat you want to edit]");
 
   } catch (err) {
     // do stuff only if response is other than not found
     if (err.response.status !== 404) {
-      message.channel.send("There was a problem with your request. Please, try again later.");
       console.log(err);
-      return;
+      return message.channel.send("There was a problem with your request. Please, try again later.");
     };
   };
 
-  // 3. ASK FOR PARAMS
+  // 2. ASK FOR PARAMS
   message.channel.send("What is your family name?");
   const familyName = await validateResponseRegex(message, "Invalid format", /^([a-z]|[A-Z]|_)[^0-9]+$/g);
-  if (familyName === "exit") {
-    message.channel.send("Bye!");
-    return;
-  }
+  if (familyName === "exit") return message.channel.send("Bye!");
 
   message.channel.send("What is your character's class?");
-  const characterClass = await validateResponse(message, "This class doesn't exist", ["archer", "berserker", "dark knight", "guardian", "hashashin", "kunoichi", "lahn", "maehwa", "musa", "mystic", "ninja", "nova", "ranger", "sage", "shai", "sorceress", "striker", "tamer", "valkyrie", "warrior", "witch", "wizard"]);
-  if (characterClass === "exit") {
-    message.channel.send("Bye!");
-    return;
-  }
+  const characterClass = await validateClass(message);
+  if (characterClass === "exit") return message.channel.send("Bye!");
 
-  message.channel.send("Do you play awakening or succession?");
-  const stance = await validateResponse(message, "Invalid response", ["succession", "awakening"]);
-  if (stance === "exit") {
-    message.channel.send("Bye!");
-    return;
+  let stance;
+  if (characterClass === "shai") {
+    stance = "awakening"
+  } else {
+    message.channel.send("Do you play awakening or succession?");
+    stance = await validateStance(message);
+    if (stance === "exit") return message.channel.send("Bye!");
   }
 
   message.channel.send("What is your regular AP?");
   const regularAp = await validateResponseRegex(message, "Invalid format", /^([0-9])+$/g);
-  if (regularAp === "exit") {
-    message.channel.send("Bye!");
-    return;
-  }
+  if (regularAp === "exit") return message.channel.send("Bye!");
 
   message.channel.send("What is your awakening AP?");
   const awakeningAp = await validateResponseRegex(message, "Invalid format", /^([0-9])+$/g);
-  if (awakeningAp === "exit") {
-    message.channel.send("Bye!");
-    return;
-  }
+  if (awakeningAp === "exit") return message.channel.send("Bye!");
 
   message.channel.send("What is your DP?");
   const dp = await validateResponseRegex(message, "Invalid format", /^([0-9])+$/g);
-  if (dp === "exit") {
-    message.channel.send("Bye!");
-    return;
-  }
+  if (dp === "exit") return message.channel.send("Bye!");
 
-  // 4. CREATE PROFILE
+  // TODO: ask for level
+
+  // 3. CREATE PROFILE
   try {
-    await axios({
-      method: 'POST',
-      url: `http://localhost:3000/api/v1/users`,
-      data: {
-        id: message.author.id,
-        familyName,
-        characterClass,
-        stance,
-        regularAp,
-        awakeningAp,
-        dp,
-        guild: guildConfig._id
-      }
+    await axios.post("http://localhost:3000/api/v1/users", {
+      id: message.author.id,
+      familyName,
+      characterClass,
+      stance,
+      regularAp,
+      awakeningAp,
+      dp,
+      guild: guildConfig._id
     });
   } catch (err) {
-    message.channel.send("There was a problem with your request. Please, try again later.");
     console.log(err);
-    return;
-  }
+    return message.channel.send("There was a problem with your request. Please, try again later.");
+  };
 
   message.channel.send("Profile created! use `?profile show` to see more details");
 }
