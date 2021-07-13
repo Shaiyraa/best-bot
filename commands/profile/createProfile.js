@@ -1,7 +1,7 @@
-const validateResponseRegex = require('../../utils/validateResponseRegex')
-const axios = require('axios')
-const validateResponse = require('../../utils/validateResponse')
-const isGuildInDB = require('../../utils/isGuildInDB')
+const axios = require('axios');
+const isGuildInDB = require('../../utils/isGuildInDB');
+const validateResponseRegex = require('../../utils/validateResponseRegex');
+const validateResponse = require('../../utils/validateResponse');
 
 
 module.exports = async (message) => {

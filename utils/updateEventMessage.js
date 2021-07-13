@@ -64,16 +64,25 @@ module.exports = async (event, eventMessage) => {
   }];
 
   // 3c. Define group fields          // TODO: make it more efficient
+  let isDefaultNeeded = false // flag to display DEFAULT group
   const groupFields = event.guild.groups.map(group => ({ name: group.name, value: [] }));
 
-  let groupObj = {}
+  let groupObj = {};
   if (event.yesMembers.length) {
     // loop through yesMembers
     event.yesMembers.map(member => {
-      if (!groupObj[member.group.name]) groupObj[member.group.name] = []
-      groupObj[member.group.name].push(member.familyName)
-    })
+      if (!member.group) {
+        member.group = { name: "DEFAULT" };
+        isDefaultNeeded = true
+
+      }
+      if (!groupObj[member.group.name]) groupObj[member.group.name] = [];
+      groupObj[member.group.name].push(member.familyName);
+    });
   };
+
+  // if theres a user without a group, create default one
+  if (isDefaultNeeded) groupFields.push({ name: "DEFAULT", value: [] });
 
   groupFields.map(field => {
     groupObj[field.name] ? field.value = `\`\`\`${groupObj[field.name].join(", ")}\`\`\`` : field.value = "```empty```"

@@ -21,7 +21,7 @@ module.exports.run = async (bot, message, args) => {
       break;
     };
     case "edit": {
-      editProfile(message, args[1], args[2]); // ?profile edit eva 234 || if params are empty, ask what to update
+      editProfile(message, args[1]); // ?profile edit eva 234 || if params are empty, ask what to update
       break;
     };
     default: {

@@ -60,8 +60,8 @@ module.exports = async (message, familyName) => {
     .addField("DP:", user.dp, true)
     .addField("Class:", `${user.stance} ${user.characterClass}`, true)
     .addField("Level:", `99`, false)
-    .addField("Nodewar Group:", user.group.name, true)
-    .addField("Proof:", `[Link](https://i.imgur.com/RewZtoA.jpg)`, true)
+    .addField("Nodewar Group:", `${user.group ? user.group.name : "DEFAULT"}`, true)
+    .addField("Proof:", `[Link](https://media.tenor.com/images/a1505c6e6d37aa2b7c5953741c0177dc/tenor.gif)`, true)
   //.setColor("#58de49");
 
   message.channel.send(embed)
