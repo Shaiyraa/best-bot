@@ -2,6 +2,8 @@ const axios = require('axios');
 
 module.exports = async (message, guildConfig, groupName) => {
 
+  if (!groupName) return message.channel.send("Please, specify the group name. Try ?group delete [group name]")
+
   // 1. CHECK IF GROUP EXISTS
   let group = guildConfig.groups.filter(group => group.name === groupName.toUpperCase());
   if (!group.length) return message.channel.send("Wrong group name.");

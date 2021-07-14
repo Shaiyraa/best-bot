@@ -3,12 +3,13 @@ const axios = require('axios');
 const config = require('../../config.json');
 
 const updateEventMessage = require('../../utils/updateEventMessage');
+const scheduleAlertsForEvent = require('../../utils/scheduleAlertsForEvent');
 
 const validateContent = require('../../utils/validators/validateContent');
 const validateResponseRegex = require('../../utils/validators/validateResponseRegex');
 const validateResponse = require('../../utils/validators/validateResponse');
 
-module.exports = async (message, guildConfig, date) => {
+module.exports = async (bot, message, guildConfig, date) => {
 
   let hour;
   let type;
@@ -32,41 +33,27 @@ module.exports = async (message, guildConfig, date) => {
 
     message.channel.send("What is the date of the event?");
     date = await validateResponseRegex(message, "Invalid date format", /^(?:(?:31(\/|-|.)(?:0?[13578]|1[02]))\1|(?:(?:29|30)(\/|-|.)(?:0?[13-9]|1[0-2])\2))(?:(?:1[6-9]|[2-9]\d)?\d{2})$|^(?:29(\/|-|.)0?2\3(?:(?:(?:1[6-9]|[2-9]\d)?(?:0[48]|[2468][048]|[13579][26])|(?:(?:16|[2468][048]|[3579][26])00))))$|^(?:0?[1-9]|1\d|2[0-8])(\/|-|.)(?:(?:0?[1-9])|(?:1[0-2]))\4(?:(?:1[6-9]|[2-9]\d)?\d{2})$/g);
-    if (date === "exit") {
-      message.channel.send("Bye!");
-      return;
-    };
+    if (date === "exit") return message.channel.send("Bye!");
 
     message.channel.send('What time is the event?');
     hour = await validateResponseRegex(message, "Invalid time.", /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/g);
-    if (hour === "exit") {
-      message.channel.send("Bye!");
-      return;
-    };
+    if (hour === "exit") return message.channel.send("Bye!");
 
     // set proper date
     date = new Date(date.split(/\D/g)[2], date.split(/\D/g)[1] - 1, date.split(/\D/g)[0], hour.split(":")[0], hour.split(":")[1]);
 
     message.channel.send('What is the type of the event? Possible types: "nodewar", "siege", "guildevent".');
     type = await validateResponse(message, "Invalid response (nodewar, siege, guildevent)", ['nodewar', 'siege', 'guildevent']);
-    if (type === "exit") {
-      message.channel.send("Bye!");
-      return;
-    };
+    if (type === "exit") return message.channel.send("Bye!");
+
 
     message.channel.send('What is the max amount of people (1-100)?');
     count = await validateResponseRegex(message, "Invalid number.", /^[1-9][0-9]?$|^100$/g);
-    if (count === "exit") {
-      message.channel.send("Bye!");
-      return;
-    };
+    if (count === "exit") return message.channel.send("Bye!");
 
     message.channel.send("Is the event mandatory (yes/no)?");
     mandatory = await validateResponse(message, "Invalid answer (yes/no).", ["yes", "no"]);
-    if (mandatory === "exit") {
-      message.channel.send("Bye!");
-      return;
-    };
+    if (mandatory === "exit") return message.channel.send("Bye!");
 
     mandatory === "yes" ?
       mandatory = true
@@ -75,10 +62,7 @@ module.exports = async (message, guildConfig, date) => {
 
     message.channel.send("Do you want to enable automatic alerts (yes/no)?");
     alerts = await validateResponse(message, "Invalid answer (yes/no).", ["yes", "no"]);
-    if (alerts === "exit") {
-      message.channel.send("Bye!");
-      return;
-    };
+    if (alerts === "exit") return message.channel.send("Bye!");
 
     alerts === "yes" ?
       alerts = true
@@ -87,10 +71,7 @@ module.exports = async (message, guildConfig, date) => {
   };
 
   // TODO: put it into the function checking date instead
-  if (date < Date.now()) {
-    message.channel.send("Can't create event with past date. Try again.");
-    return;
-  };
+  if (date < Date.now()) return message.channel.send("Can't create event with past date. Try again.");
 
   // 3. SET MESSAGE CONTENT
   let content = "no description";
@@ -99,8 +80,7 @@ module.exports = async (message, guildConfig, date) => {
 
   switch (contentResponse) {
     case "exit": {
-      message.channel.send("Bye!");
-      return;
+      return message.channel.send("Bye!");
     }
     case "yes": {
       message.channel.send("Type in the content (max. 1024 characters allowed):");
@@ -153,12 +133,11 @@ module.exports = async (message, guildConfig, date) => {
       messageId
     });
   } catch (err) {
-    message.channel.send("There was a problem with your request. Please, try again later.");
     console.log(err);
-    return;
+    return message.channel.send("There was a problem with your request. Please, try again later.");
   };
 
-  const event = res.data.data.event;
+  const { event, alert } = res.data.data;
 
   // 7. UPDATE MESSAGE WITH REAL DATA
   await updateEventMessage(event, reactionMessage);
@@ -207,8 +186,10 @@ module.exports = async (message, guildConfig, date) => {
 
   });
 
+  // 9. SCHEDULE A JOBS FOR ALERT
+  await scheduleAlertsForEvent(bot, guildConfig, event, [alert])
 
-  // 9. INFORM THAT EVENT WAS CREATED
+  // 10. INFORM THAT EVENT WAS CREATED
   const eventCreatedEmbed = new Discord.MessageEmbed()
     .setTitle("Event has been created")
     .setDescription(`[Link to the event post](${reactionMessage.url})`);

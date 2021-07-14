@@ -2,7 +2,8 @@
   "dependencies": {
     "axios": "^0.21.1",
     "discord.js": "^12.5.3",
-    "dotenv": "^10.0.0"
+    "dotenv": "^10.0.0",
+    "node-schedule": "^2.0.0"
   },
   "name": "best-bot",
   "version": "1.0.0",

@@ -45,7 +45,7 @@ module.exports = async (message, guildConfig, argDate) => {
 
     const filter = (reaction, user) => {
       if (!emojis.includes(reaction.emoji.name)) {
-        let reactionMap = reactionMessage.reactions.resolve(reaction.emoji.name);
+        let reactionMap = reactionMessage.reactions.resolve(reaction.emoji.id) || reactionMessage.reactions.resolve(reaction.emoji.name);
         reactionMap?.users.remove(user.id);
       };
       return emojis.includes(reaction.emoji.name);

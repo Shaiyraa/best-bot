@@ -1,14 +1,15 @@
 const axios = require('axios');
 const config = require('./config.json');
 const updateEventMessage = require('./utils/updateEventMessage');
+const scheduleAlertsForEvent = require('./utils/scheduleAlertsForEvent');
 
-const setEventListeners = async bot => {
+const setEventListenersAndScheduleAlerts = async bot => {
   // 1. GET FUTURE EVENTS FROM DB
   let res;
   try {
     res = await axios.get(`http://localhost:3000/api/v1/events?date[gte]=${Date.now()}`);
   } catch (err) {
-    console.log(err);
+    return console.log(err);
   };
 
   const events = res.data.data.events;
@@ -26,7 +27,7 @@ const setEventListeners = async bot => {
 
       if (!emojis.includes(reaction.emoji.name)) {
         let reactionMap = eventMessage.reactions.resolve(reaction.emoji.id) || eventMessage.reactions.resolve(reaction.emoji.name);
-        reactionMap?.users.remove(user.id);
+        reactionMap?.remove(user.id);
       }
       return emojis.includes(reaction.emoji.name);
     }
@@ -72,14 +73,11 @@ const setEventListeners = async bot => {
       reactionMap?.users.remove(user.id);
 
     });
+
+    // 4. SCHEDULE ALERTS
+    await scheduleAlertsForEvent(bot, event.guild, event);
+
   })
 };
 
-module.exports = setEventListeners;
-
-
-    // .catch((err) => {
-    //   console.log(err)
-    //   // console.log("Restarting function...");
-    //   // return setEventListeners(bot);
-    // });
+module.exports = setEventListenersAndScheduleAlerts;

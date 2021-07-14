@@ -13,7 +13,7 @@ module.exports.run = async (bot, message, args) => {
 
   switch (args[0]) {
     case "create": {
-      createEvent(message, guildConfig, args[1]);
+      createEvent(bot, message, guildConfig, args[1]);
       break;
     };
     case "list": {

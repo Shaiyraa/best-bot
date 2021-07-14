@@ -9,10 +9,7 @@ module.exports = async (message, guildConfig, event) => {
   // ask for param
   message.channel.send('What do you want to update (type, mandatory, alerts, description)?');
   let param = await validateResponse(message, "Invalid response (options: type, mandatory, alerts, description)", ["type", "mandatory", "alerts", "description"]);
-  if (param === "exit") {
-    message.channel.send("Bye!");
-    return;
-  };
+  if (param === "exit") return message.channel.send("Bye!");
 
   // ask for value
   let value;
@@ -20,10 +17,7 @@ module.exports = async (message, guildConfig, event) => {
     case "type": {
       message.channel.send(`What is the type of the event? Current type: ${event.type}. Possible types: "nodewar", "siege", "guildevent"`);
       value = await validateResponse(message, "Invalid response (nodewar, siege, guildevent)", ["nodewar", "siege", "guildevent"]);
-      if (value === "exit") {
-        message.channel.send("Bye!");
-        return;
-      };
+      if (value === "exit") return message.channel.send("Bye!");
 
       break;
     };

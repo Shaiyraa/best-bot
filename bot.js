@@ -3,7 +3,7 @@ const fs = require("fs");
 const dotenv = require('dotenv');
 dotenv.config({ path: './config.env' })
 
-const setEventListeners = require('./setEventListeners');
+const setEventListenersAndScheduleAlerts = require('./setEventListenersAndScheduleAlerts');
 const config = require("./config.json");
 
 // create bot
@@ -11,7 +11,7 @@ const bot = new Discord.Client({ disableEveryone: true });
 
 bot.on("ready", async () => {
   bot.user.setActivity('type ?help', { type: 'PLAYING' })
-  await setEventListeners(bot).catch(console.log)
+  await setEventListenersAndScheduleAlerts(bot).catch(console.log)
 })
 
 // create commands
@@ -64,7 +64,6 @@ bot.on("message", async message => {
 
 
 bot.login(process.env.DISCORD_TOKEN)
-
 /*
 
 TODO:
