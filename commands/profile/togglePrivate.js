@@ -18,8 +18,8 @@ module.exports = async (message, guildConfig, value) => {
       }
     });
   } catch (err) {
-    console.log(err);
-    return message.channel.send(err.response.data.message);
+    console.log(err)
+    return message.channel.send("There was a problem with your request. Please, try again later.");
   };
 
   const user = resUser.data.data.user;
@@ -31,8 +31,8 @@ module.exports = async (message, guildConfig, value) => {
       private: value
     });
   } catch (err) {
-    console.log(err);
-    return message.channel.send(err.response.data.message);
+    console.log(err)
+    return message.channel.send("There was a problem with your request. Please, try again later.");
   };
 
   message.channel.send(`Profile visibility set to ${value ? "private" : "public"}!`);

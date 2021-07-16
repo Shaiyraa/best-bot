@@ -26,6 +26,7 @@ module.exports = async (message, guildConfig, event) => {
       };
     })
     .catch((err) => {
-      message.channel.send(err.response.data.message);
+      console.log(err)
+      return message.channel.send("There was a problem with your request. Please, try again later.");
     });
 };

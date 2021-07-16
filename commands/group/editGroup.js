@@ -38,8 +38,8 @@ module.exports = async (message, guildConfig, groupName) => {
   try {
     res = await axios.patch(`http://localhost:3000/api/v1/groups/${group._id}?${param}=${value}`);
   } catch (err) {
-    console.log(err);
-    return message.channel.send(err.response.data.message);
+    console.log(err)
+    return message.channel.send("There was a problem with your request. Please, try again later.");
   };
 
 

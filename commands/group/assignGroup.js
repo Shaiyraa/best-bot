@@ -17,8 +17,8 @@ module.exports = async (message, guildConfig, groupName, familyName) => {
         userFamilyName: familyName
       });
     } catch (err) {
-      console.log(err);
-      return message.channel.send(err.response.data.message);
+      console.log(err)
+      return message.channel.send("There was a problem with your request. Please, try again later.");
     };
 
     message.channel.send(`Assigned ${group.name} group to ${familyName}`);
@@ -42,8 +42,8 @@ module.exports = async (message, guildConfig, groupName, familyName) => {
         familyNames: familyNamesArray
       });
     } catch (err) {
-      message.channel.send(err.response.data.message);
-      console.log(err);
+      console.log(err)
+      return message.channel.send("There was a problem with your request. Please, try again later.");
     };
 
     message.channel.send(`Assigned ${group.name} group chosen members`);

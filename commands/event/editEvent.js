@@ -45,7 +45,7 @@ module.exports = async (message, guildConfig, event) => {
           break;
         };
         default: {
-          value = "no description";
+          value = guildConfig.defaultEventMessage;
         };
       };
 

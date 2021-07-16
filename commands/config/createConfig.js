@@ -5,10 +5,7 @@ const validateChannel = require('../../utils/validators/validateChannel');
 module.exports = async (message) => {
 
   // 1. RESTRICT ROLE
-  if (!message.member.hasPermission("ADMINISTRATOR")) {
-    message.channel.send("Only administrators can this command.")
-    return
-  }
+  if (!message.member.hasPermission("ADMINISTRATOR")) return message.channel.send("Only administrators can this command.");
 
   // 2. CHECK IF GUILD CONFIG ALREADY EXISTS
   let res;
@@ -19,45 +16,31 @@ module.exports = async (message) => {
     });
 
     // if API call doesn't return err = guild exists
-    message.channel.send("Config for your guild already exists. Try ?config edit to update it."); // TODO: "would you like to modify it? yes/no"
-    return;
+    return message.channel.send("Config for your guild already exists. Try ?config edit to update it."); // TODO: "would you like to modify it? yes/no"
 
   } catch (err) {
     if (err.response.status !== 404) {
-      message.channel.send("There was a problem with your request. Please, try again later.");
       console.log(err);
-      return;
+      return message.channel.send("There was a problem with your request. Please, try again later.");
     };
   };
 
   // 3. ASK FOR PARAMS
-  message.channel.send("Tag guild member role:")
-  let memberRoleTag = await validateRole(message, "Invalid role")
-  if (memberRoleTag === "exit") {
-    message.channel.send("Bye!");
-    return;
-  }
+  message.channel.send("Tag guild member role:");
+  let memberRoleTag = await validateRole(message);
+  if (memberRoleTag === "exit") return message.channel.send("Bye!");
 
   message.channel.send("Tag guild officer role:")
-  let officerRoleTag = await validateRole(message, "Invalid role")
-  if (officerRoleTag === "exit") {
-    message.channel.send("Bye!");
-    return;
-  }
+  let officerRoleTag = await validateRole(message);
+  if (officerRoleTag === "exit") return message.channel.send("Bye!");
 
-  message.channel.send("Tag the channel where you want your event announcements to pop up:")
-  let announcementsChannelTag = await validateChannel(message, "Invalid channel")
-  if (announcementsChannelTag === "exit") {
-    message.channel.send("Bye!");
-    return;
-  }
+  message.channel.send("Tag the channel where you want your event announcements to pop up:");
+  let announcementsChannelTag = await validateChannel(message, "Invalid channel");
+  if (announcementsChannelTag === "exit") return message.channel.send("Bye!");
 
-  message.channel.send("Tag the channel where you want to see reminders for events:")
-  let remindersChannelTag = await validateChannel(message, "Invalid channel")
-  if (remindersChannelTag === "exit") {
-    message.channel.send("Bye!");
-    return;
-  }
+  message.channel.send("Tag the channel where you want to see reminders for events:");
+  let remindersChannelTag = await validateChannel(message, "Invalid channel");
+  if (remindersChannelTag === "exit") return message.channel.send("Bye!");
 
   // 4. CREATE GUILD DOC
   try {
@@ -73,9 +56,8 @@ module.exports = async (message) => {
       }
     });
   } catch (err) {
-    message.channel.send("There was a problem with your request. Please, try again later.");
     console.log(err);
-    return;
+    return message.channel.send("There was a problem with your request. Please, try again later.");
   };
 
   message.channel.send("Config updated.");

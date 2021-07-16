@@ -16,6 +16,7 @@ module.exports = async (message, guildConfig, familyName) => {
         }
       });
     } catch (err) {
+      if (err.response.status === 404) return message.channel.send("This profile doesn't exist. Try ?profile create");
       console.log(err);
       return message.channel.send("There was a problem with your request. Please, try again later.");
     };
@@ -27,11 +28,7 @@ module.exports = async (message, guildConfig, familyName) => {
   try {
     res = await axios({
       method: 'GET',
-      url: `http://localhost:3000/api/v1/users/`,
-      data: {
-        familyName,
-        guild: guildConfig._id
-      }
+      url: `http://localhost:3000/api/v1/users?familyName=${familyName}&guild=${guildConfig._id}`
     });
 
   } catch (err) {

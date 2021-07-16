@@ -1,6 +1,6 @@
 const config = require('../../config.json');
 
-module.exports = async (message, errMessage) => {
+module.exports = async (message) => {
   let response = "";
 
   const filter = m => m.author.id === message.author.id;
@@ -22,6 +22,6 @@ module.exports = async (message, errMessage) => {
   response = response.replace(/([<>&#])+/g, "");
   if (message.guild.channels.cache.get(response)) return response;
 
-  if (response !== "exit") message.channel.send(errMessage);
-  return await validateResponseChannel(errMessage);
+  if (response !== "exit") message.channel.send("Invalid channel");
+  return await validateResponseChannel(message);
 }

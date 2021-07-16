@@ -1,18 +1,17 @@
 const axios = require('axios');
 
-module.exports = async (message, guildConfig) => {
+module.exports = async (memberId, guildId) => {
   let res;
   try {
     res = await axios({
       method: 'GET',
-      url: `http://localhost:3000/api/v1/users/discord/${message.author.id}`,
+      url: `http://localhost:3000/api/v1/users/discord/${memberId}`,
       data: {
-        guild: guildConfig._id
+        guild: guildId
       }
     });
 
   } catch (err) {
-    message.channel.send("Profile not found. Try ?profile create");
     console.log(err);
     return false;
   };

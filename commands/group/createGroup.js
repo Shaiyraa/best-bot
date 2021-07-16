@@ -17,8 +17,8 @@ module.exports = async (message, guildConfig, groupName) => {
       name: groupName
     });
   } catch (err) {
-    console.log(err);
-    return message.channel.send(err.response.data.message);
+    console.log(err)
+    return message.channel.send("There was a problem with your request. Please, try again later.");
   };
 
   // 3. SEND RESPONSE

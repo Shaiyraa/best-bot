@@ -74,7 +74,7 @@ module.exports = async (bot, message, guildConfig, date) => {
   if (date < Date.now()) return message.channel.send("Can't create event with past date. Try again.");
 
   // 3. SET MESSAGE CONTENT
-  let content = "no description";
+  let content = guildConfig.defaultEventMessage;
   message.channel.send("Do you want to create a custom message (yes/no)?");
   const contentResponse = await validateResponse(message, "Invalid answer (Valid options: yes/no).", ["yes", "no"]);
 

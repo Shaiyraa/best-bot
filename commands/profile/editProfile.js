@@ -8,8 +8,8 @@ const validateStance = require("../../utils/validators/validateStance")
 module.exports = async (message, guildConfig, param) => {
 
   // 1. CHECK IF USER EXISTS
-  const user = await isUserInDB(message, guildConfig)
-  if (!user) return;
+  const user = await isUserInDB(message.author.id, guildConfig._id)
+  if (!user) return message.channel.send("Profile not found. Try ?profile create");
 
   // 2a. GET PARAM
   if (!param) {
@@ -84,8 +84,8 @@ module.exports = async (message, guildConfig, param) => {
   try {
     res = await axios.patch(`http://localhost:3000/api/v1/users/${user._id}?${param}=${value}`);
   } catch (err) {
-    console.log(err);
-    return message.channel.send(err.response.data.message);
+    console.log(err)
+    return message.channel.send("There was a problem with your request. Please, try again later.");
   };
 
   message.channel.send("Profile updated");

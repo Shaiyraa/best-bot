@@ -3,6 +3,7 @@ const axios = require('axios');
 const editGroup = require('./editGroup');
 const deleteGroup = require('./deleteGroup');
 const config = require('../../config.json');
+
 module.exports = async (message, guildConfig) => {
 
   // 1. GET ALL USERS FROM THE GUILD
@@ -14,11 +15,13 @@ module.exports = async (message, guildConfig) => {
     return messge.channel.send(err.response.data.message);
   };
   const users = res.data.data.users;
-  // 2. GET ALL THE GROUPS FOR THIS GUILD
 
+  // 2. GET ALL THE GROUPS FOR THIS GUILD
   const groups = guildConfig.groups;
+  if (!groups.length) return message.channel.send("No groups found.");
 
   groups.forEach(async group => {
+
     // 3. GET ALL USERS FROM THE GROUP
     let count = 0;
     users.filter(member => {

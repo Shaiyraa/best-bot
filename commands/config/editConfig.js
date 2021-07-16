@@ -1,5 +1,71 @@
+const axios = require('axios');
+const isGuildInDB = require('../../utils/isGuildInDB');
+const validateResponse = require('../../utils/validators/validateResponse');
+const validateRole = require('../../utils/validators/validateRole');
+const validateChannel = require('../../utils/validators/validateChannel');
+const validateContent = require("../../utils/validators/validateContent");
 
-module.exports = async (message, guildConfig) => {
-  message.channel.send("code it ffs");
+module.exports = async (message) => {
 
-}
+  // 1. CHECK IF CONFIG EXISTS
+  const guildConfig = await isGuildInDB(message);
+  if (!guildConfig) return;
+
+  // 2. ASK WHAT TO UPDATE
+  message.channel.send('What do you want to update (memberRole, officerRole, announcementsChannel, remindersChannel, defaultEventMessage)?');
+  let param = await validateResponse(message, "Invalid response (memberRole, officerRole, announcementsChannel, remindersChannel, defaultEventMessage)", ["memberRole", "officerRole", "announcementsChannel", "remindersChannel", "defaultEventMessage"]);
+  if (param === "exit") return message.channel.send("Bye!");
+
+  // 3. ASK FOR VALUE
+  let value;
+  switch (param) {
+    case "memberRole": {
+      message.channel.send("Tag the member role:");
+      value = await validateRole(message);
+      if (value === "exit") return message.channel.send("Bye!");
+
+      break;
+    };
+    case "officerRole": {
+      message.channel.send("Tag the officer role:");
+      value = await validateRole(message);
+      if (value === "exit") return message.channel.send("Bye!");
+
+      break;
+    };
+    case "announcementsChannel": {
+      message.channel.send("Tag the channel where you want your event announcements to pop up:");
+      value = await validateChannel(message);
+      if (value === "exit") return message.channel.send("Bye!");
+
+      break;
+    };
+    case "remindersChannel": {
+      message.channel.send("Tag the channel where you want to see reminders for events:");
+      value = await validateChannel(message);
+      if (value === "exit") return message.channel.send("Bye!");
+
+      break;
+    };
+    case "defaultEventMessage": {
+      message.channel.send("Type in the content (max. 1024 characters allowed):");
+      value = await validateContent(message);
+      if (value === "exit") return message.channel.send("Bye!");
+
+      break;
+    };
+  };
+
+  // 4. CALL API
+  let res;
+  try {
+    res = await axios.patch(`http://localhost:3000/api/v1/guilds/${guildConfig._id}?${param}=${value}`);
+  } catch (err) {
+    console.log(err);
+    return message.channel.send("There was a problem with your request. Please, try again later.");
+  };
+
+
+
+  message.channel.send("Config updated!");
+};

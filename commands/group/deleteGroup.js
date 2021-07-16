@@ -22,8 +22,8 @@ module.exports = async (message, guildConfig, groupName) => {
         try {
           res = await axios.delete(`http://localhost:3000/api/v1/groups/${group._id}`);
         } catch (err) {
-          message.channel.send(err.response.data.message);
-          return console.log(err);
+          console.log(err)
+          return message.channel.send("There was a problem with your request. Please, try again later.");
         };
 
         message.channel.send("Group has been deleted");

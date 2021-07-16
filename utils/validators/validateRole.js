@@ -1,6 +1,6 @@
 const config = require('../../config.json');
 
-module.exports = async (message, errMessage) => {
+module.exports = async (message) => {
   let response = "";
 
   const filter = m => m.author.id === message.author.id;
@@ -23,6 +23,6 @@ module.exports = async (message, errMessage) => {
 
   if (message.guild.roles.cache.get(response)) return response
 
-  if (response !== "exit") message.channel.send(errMessage)
-  return await validateResponseRole(errMessage)
+  if (response !== "exit") message.channel.send("Invalid role.")
+  return await validateResponseRole(message)
 }

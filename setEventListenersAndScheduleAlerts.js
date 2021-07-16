@@ -17,6 +17,8 @@ const setEventListenersAndScheduleAlerts = async bot => {
 
   events.forEach(async event => {
     // 2. FETCH EVENT MESSAGE
+    // check if guild config exists
+    if (!event.guild) return
     const guild = await bot.guilds.fetch(event.guild.id)
     const channel = await guild.channels.cache.get(event.guild.announcementsChannel)
     const eventMessage = await channel.messages.fetch(event.messageId)

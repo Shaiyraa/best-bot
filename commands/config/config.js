@@ -4,6 +4,12 @@ const sendEmbedMessage = require('../../utils/sendEmbedMessage');
 
 module.exports.run = async (bot, message, args) => {
 
+  // 1. CHECK IF ADMIN
+  if (!message.member.hasPermission("ADMINISTRATOR")) {
+    message.channel.send("Only administrators can this command.")
+    return
+  }
+
   switch (args[0]) {
     case "create": {
       createConfig(message);
