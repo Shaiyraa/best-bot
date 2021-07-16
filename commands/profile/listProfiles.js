@@ -7,7 +7,7 @@ module.exports = async (message, guildConfig) => {
   // 1. CALL API FOR USERS IN THE GUILD
   let res;
   try {
-    res = await axios.get("http://localhost:3000/api/v1/users/", {
+    res = await axios.get(`${process.env.API_URL}/api/v1/users/`, {
       guild: guildConfig._id
     });
   } catch (err) {

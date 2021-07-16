@@ -3,7 +3,8 @@
     "axios": "^0.21.1",
     "discord.js": "^12.5.3",
     "dotenv": "^10.0.0",
-    "node-schedule": "^2.0.0"
+    "node-schedule": "^2.0.0",
+    "winston": "^3.3.3"
   },
   "name": "best-bot",
   "version": "1.0.0",

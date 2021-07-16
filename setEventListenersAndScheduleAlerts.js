@@ -7,7 +7,7 @@ const setEventListenersAndScheduleAlerts = async bot => {
   // 1. GET FUTURE EVENTS FROM DB
   let res;
   try {
-    res = await axios.get(`http://localhost:3000/api/v1/events?date[gte]=${Date.now()}`);
+    res = await axios.get(`${process.env.API_URL}/api/v1/events?date[gte]=${Date.now()}`);
   } catch (err) {
     return console.log(err);
   };
@@ -39,7 +39,7 @@ const setEventListenersAndScheduleAlerts = async bot => {
 
       const handleChangeGroup = async (goToGroup) => {
         try {
-          const res = await axios.patch('http://localhost:3000/api/v1/events/change-group', {
+          const res = await axios.patch(`${process.env.API_URL}/api/v1/events/change-group`, {
             eventId: event._id,
             userDiscordId: user.id,
             goToGroup

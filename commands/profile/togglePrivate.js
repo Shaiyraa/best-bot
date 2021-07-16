@@ -3,8 +3,15 @@ const isGuildInDB = require('../../utils/isGuildInDB')
 
 module.exports = async (message, guildConfig, value) => {
 
-  if (!value) {
-    message.channel.send(`Please, provide also the value - use ?profile private [true/false]`);
+  if (!value || (value !== "false" && value !== "true")) {
+    return message.channel.send(`Please, provide also the value - use ?profile private [true/false]`);
+  }
+
+  // convert to boolean
+  if (value === "true") {
+    value = true
+  } else {
+    value = false
   }
 
   // 1. FIND USER 
@@ -12,7 +19,7 @@ module.exports = async (message, guildConfig, value) => {
   try {
     resUser = await axios({
       method: 'GET',
-      url: `http://localhost:3000/api/v1/users/discord/${message.author.id}`,
+      url: `${process.env.API_URL}/api/v1/users/discord/${message.author.id}`,
       data: {
         guild: guildConfig._id
       }
@@ -27,7 +34,7 @@ module.exports = async (message, guildConfig, value) => {
   // 2. UPDATE
   let res;
   try {
-    res = await axios.patch(`http://localhost:3000/api/v1/users/${user._id}?private=${value}`, {
+    res = await axios.patch(`${process.env.API_URL}/api/v1/users/${user._id}?private=${value}`, {
       private: value
     });
   } catch (err) {

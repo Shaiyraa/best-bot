@@ -12,7 +12,7 @@ module.exports = async (message) => {
   try {
     res = await axios({
       method: 'GET',
-      url: `http://localhost:3000/api/v1/guilds/discord/${message.channel.guild.id}`
+      url: `${process.env.API_URL}/api/v1/guilds/discord/${message.channel.guild.id}`
     });
 
     // if API call doesn't return err = guild exists
@@ -46,7 +46,7 @@ module.exports = async (message) => {
   try {
     await axios({
       method: 'POST',
-      url: `http://localhost:3000/api/v1/guilds`,
+      url: `${process.env.API_URL}/api/v1/guilds`,
       data: {
         id: message.channel.guild.id,
         memberRole: memberRoleTag,

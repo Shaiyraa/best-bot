@@ -9,7 +9,7 @@ module.exports = async (message, guildConfig) => {
   // 1. GET ALL USERS FROM THE GUILD
   let res;
   try {
-    res = await axios.get(`http://localhost:3000/api/v1/users?guild=${guildConfig._id}`)
+    res = await axios.get(`${process.env.API_URL}/api/v1/users?guild=${guildConfig._id}`)
   } catch (err) {
     console.log(err);
     return messge.channel.send(err.response.data.message);

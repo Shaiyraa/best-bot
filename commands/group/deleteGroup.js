@@ -20,7 +20,7 @@ module.exports = async (message, guildConfig, groupName) => {
         // 3. CALL API
         let res;
         try {
-          res = await axios.delete(`http://localhost:3000/api/v1/groups/${group._id}`);
+          res = await axios.delete(`${process.env.API_URL}/api/v1/groups/${group._id}`);
         } catch (err) {
           console.log(err)
           return message.channel.send("There was a problem with your request. Please, try again later.");

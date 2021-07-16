@@ -11,7 +11,7 @@ module.exports = bot => {
       try {
         res = await axios({
           method: 'GET',
-          url: `http://localhost:3000/api/v1/guilds/discord/${newMember.guild.id}`
+          url: `${process.env.API_URL}/api/v1/guilds/discord/${newMember.guild.id}`
         });
       } catch (err) {
         console.log(err);
@@ -35,7 +35,7 @@ module.exports = bot => {
     try {
       res = await axios({
         method: 'GET',
-        url: `http://localhost:3000/api/v1/guilds/discord/${newMember.guild.id}`
+        url: `${process.env.API_URL}/api/v1/guilds/discord/${newMember.guild.id}`
       });
     } catch (err) {
       console.log(err);

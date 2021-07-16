@@ -29,7 +29,7 @@ module.exports.run = async (bot, message, args) => {
       break;
     };
     case "edit": {
-      editGroup(message, guildConfig);
+      editGroup(message, guildConfig, args[1]);
       break;
     };
     case "delete": {

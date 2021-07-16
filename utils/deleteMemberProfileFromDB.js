@@ -7,7 +7,7 @@ module.exports = async (memberId, guildId, deletedBy) => {
   if (!user) return false
 
   try {
-    await axios.delete(`http://localhost:3000/api/v1/users/${user._id}?deletedBy=${deletedBy}`);
+    await axios.delete(`${process.env.API_URL}/api/v1/users/${user._id}?deletedBy=${deletedBy}`);
   } catch (err) {
     console.log(err);
     return false

@@ -9,7 +9,7 @@ module.exports = async (bot, guildConfig, event, alerts) => {
     // 1. CALL API TO GET THE ALERTS FOR THIS EVENT
     let res;
     try {
-      res = await axios.get("http://localhost:3000/api/v1/alerts/", {
+      res = await axios.get(`${process.env.API_URL}/api/v1/alerts/`, {
         event: event._id
       });
     } catch (err) {
@@ -27,7 +27,7 @@ module.exports = async (bot, guildConfig, event, alerts) => {
       // CALL API FOR THE EVENT
       let res;
       try {
-        res = await axios.get(`http://localhost:3000/api/v1/events/${event._id}`);
+        res = await axios.get(`${process.env.API_URL}/api/v1/events/${event._id}`);
       } catch (err) {
         console.log(err);
       };
@@ -57,7 +57,7 @@ module.exports = async (bot, guildConfig, event, alerts) => {
   schedule.scheduleJob(event.date, async function () {
     let res;
     try {
-      res = await axios.delete(`http://localhost:3000/api/v1/events/${event._id}`)
+      res = await axios.delete(`${process.env.API_URL}/api/v1/events/${event._id}`)
     } catch (err) {
       console.log(err)
     };

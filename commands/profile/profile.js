@@ -48,7 +48,7 @@ module.exports.run = async (bot, message, args) => {
     default: {
       sendEmbedMessage(message.channel, "Options:", [
         "?profile create - to create new profile",
-        "?profile show [discord name / family name] - to show member's profile; use without [name] to see your own profile",
+        "?profile show [family name] - to show member's profile; use without [name] to see your own profile",
         "?profile list - to display all profiles",
         "?profile edit - to edit your profile",
         "?profile private [true/false] - to set your profile to private/public",

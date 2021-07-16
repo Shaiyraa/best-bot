@@ -10,7 +10,7 @@ module.exports = async (message, guildConfig, familyName) => {
     try {
       res = await axios({
         method: 'GET',
-        url: `http://localhost:3000/api/v1/users/discord/${message.author.id}`,
+        url: `${process.env.API_URL}/api/v1/users/discord/${message.author.id}`,
         data: {
           guild: guildConfig._id
         }
@@ -24,21 +24,22 @@ module.exports = async (message, guildConfig, familyName) => {
     familyName = res.data.data.user.familyName;
   }
 
+  // 1. FIND USER
   let res;
   try {
     res = await axios({
       method: 'GET',
-      url: `http://localhost:3000/api/v1/users?familyName=${familyName}&guild=${guildConfig._id}`
+      url: `${process.env.API_URL}/api/v1/users?familyName=${familyName}&guild=${guildConfig._id}`
     });
-
   } catch (err) {
-    if (err.response.status === 404) return message.channel.send("This profile doesn't exist.");
     console.log(err);
     return message.channel.send("There was a problem with your request. Please, try again later.");
   }
 
+  if (!res.data.results) return message.channel.send("This profile doesn't exist.");
   const user = res.data.data.users[0];
 
+  // 2. DISPLAY MESSAGE
   const embed = new Discord.MessageEmbed().setDescription(`Profile of **${user.familyName}**:`);
 
   if (!user.private) {

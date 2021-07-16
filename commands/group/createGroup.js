@@ -13,11 +13,12 @@ module.exports = async (message, guildConfig, groupName) => {
   // 2. POST THE GROUP TO DB
   let res;
   try {
-    res = await axios.post(`http://localhost:3000/api/v1/guilds/${guildConfig._id}/groups`, {
+    res = await axios.post(`${process.env.API_URL}/api/v1/guilds/${guildConfig._id}/groups`, {
       name: groupName
     });
   } catch (err) {
     console.log(err)
+    if (err.response.status === 403) return message.channel.send("A group with this name already exists.");
     return message.channel.send("There was a problem with your request. Please, try again later.");
   };
 

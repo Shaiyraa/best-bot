@@ -5,7 +5,7 @@ module.exports = async (memberId, guildId) => {
   try {
     res = await axios({
       method: 'GET',
-      url: `http://localhost:3000/api/v1/users/discord/${memberId}`,
+      url: `${process.env.API_URL}/api/v1/users/discord/${memberId}`,
       data: {
         guild: guildId
       }

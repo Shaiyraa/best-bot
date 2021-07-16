@@ -1,11 +1,14 @@
 const Discord = require("discord.js");
 const fs = require("fs");
+const axios = require('axios');
 const dotenv = require('dotenv');
 dotenv.config({ path: './config.env' })
 
 const setEventListenersAndScheduleAlerts = require('./setEventListenersAndScheduleAlerts');
 const listenForMemberChanges = require("./listenForMemberChanges");
 const config = require("./config.json");
+
+axios.defaults.headers.common['authorization'] = `Bot ${process.env.DISCORD_TOKEN}`
 
 // create bot
 const bot = new Discord.Client({ disableEveryone: true });

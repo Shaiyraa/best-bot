@@ -4,12 +4,12 @@ const config = require('../../config.json');
 const deleteEvent = require('./deleteEvent');
 const editEvent = require('./editEvent');
 
-module.exports = async (message, guildConfig, argDate) => {
+module.exports = async (message, guildConfig) => {
 
   // 1. GET ALL THE EVENTS FOR THIS GUILD
   let res;
   try {
-    res = await axios.get("http://localhost:3000/api/v1/events", {
+    res = await axios.get(`${process.env.API_URL}/api/v1/events`, {
       guild: guildConfig._id
     });
   } catch (err) {

@@ -49,6 +49,7 @@ module.exports = async (message, guildConfig, event) => {
         };
       };
 
+      param = "content"
       break;
     };
   }
@@ -57,7 +58,7 @@ module.exports = async (message, guildConfig, event) => {
 
   let res;
   try {
-    res = await axios.patch(`http://localhost:3000/api/v1/events/${event._id}?${param}=${value}`);
+    res = await axios.patch(`${process.env.API_URL}/api/v1/events/${event._id}?${param}=${value}`);
   } catch (err) {
     console.log(err);
     return message.channel.send("There was a problem with your request. Please, try again later.");

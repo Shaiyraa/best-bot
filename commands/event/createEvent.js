@@ -122,7 +122,7 @@ module.exports = async (bot, message, guildConfig, date) => {
   // a) axios call to save event
   let res;
   try {
-    res = await axios.post('http://localhost:3000/api/v1/events', {
+    res = await axios.post(`${process.env.API_URL}/api/v1/events`, {
       date,
       type,
       maxCount: count,
@@ -156,7 +156,7 @@ module.exports = async (bot, message, guildConfig, date) => {
 
     const handleChangeGroup = async (goToGroup) => {
       try {
-        const res = await axios.patch('http://localhost:3000/api/v1/events/change-group', {
+        const res = await axios.patch(`${process.env.API_URL}/api/v1/events/change-group`, {
           eventId: event._id,
           userDiscordId: user.id,
           goToGroup

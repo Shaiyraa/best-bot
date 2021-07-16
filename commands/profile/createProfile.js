@@ -12,7 +12,7 @@ module.exports = async (message, guildConfig) => {
   try {
     res = await axios({
       method: 'GET',
-      url: `http://localhost:3000/api/v1/users/discord/${message.author.id}`,
+      url: `${process.env.API_URL}/api/v1/users/discord/${message.author.id}`,
       data: {
         guild: guildConfig._id
       }
@@ -63,7 +63,7 @@ module.exports = async (message, guildConfig) => {
 
   // 3. CREATE PROFILE
   try {
-    await axios.post("http://localhost:3000/api/v1/users", {
+    await axios.post(`${process.env.API_URL}/api/v1/users`, {
       id: message.author.id,
       familyName,
       characterClass,

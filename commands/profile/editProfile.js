@@ -77,12 +77,15 @@ module.exports = async (message, guildConfig, param) => {
 
       break;
     };
+    default: {
+      return message.channel.send(`I can't update ${param}.`);
+    };
   };
 
   // 3. CALL API TO UPDATE
   let res;
   try {
-    res = await axios.patch(`http://localhost:3000/api/v1/users/${user._id}?${param}=${value}`);
+    res = await axios.patch(`${process.env.API_URL}/api/v1/users/${user._id}?${param}=${value}`);
   } catch (err) {
     console.log(err)
     return message.channel.send("There was a problem with your request. Please, try again later.");

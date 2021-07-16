@@ -21,7 +21,7 @@ module.exports = async (message, guildConfig, familyName) => {
           // 2. FETCH MEMBER
           let res;
           try {
-            res = await axios.get(`http://localhost:3000/api/v1/users?familyName=${familyName}&guild=${guildConfig._id}`);
+            res = await axios.get(`${process.env.API_URL}/api/v1/users?familyName=${familyName}&guild=${guildConfig._id}`);
           } catch (err) {
             console.log(err);
             return message.channel.send("There was a problem with your request. Please, try again later.")
@@ -33,7 +33,7 @@ module.exports = async (message, guildConfig, familyName) => {
           await deleteMemberProfileFromDB(member.id, guildConfig._id, "admin");
         } else {
           try {
-            await axios.delete(`http://localhost:3000/api/v1/users/discord/${message.author.id}?deletedBy=user`);
+            await axios.delete(`${process.env.API_URL}/api/v1/users/discord/${message.author.id}?deletedBy=user`);
           } catch (err) {
             console.log(err);
             return message.channel.send("There was a problem with your request. Please, try again later.")

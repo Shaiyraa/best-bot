@@ -16,7 +16,7 @@ module.exports.run = async (bot, message, args) => {
       break;
     };
     case "edit": {
-      editConfig(message);
+      editConfig(message, args[1]);
       break;
     };
     default: {

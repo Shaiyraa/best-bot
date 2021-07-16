@@ -12,7 +12,7 @@ module.exports = async (message, guildConfig, event) => {
 
         // 2. CALL API TO DELETE THE EVENT
         try {
-          await axios.delete(`http://localhost:3000/api/v1/events/${event._id}`)
+          await axios.delete(`${process.env.API_URL}/api/v1/events/${event._id}`)
         } catch (err) {
           console.log(err);
           return message.channel.send("There was a problem with your request. Please, try again later.")

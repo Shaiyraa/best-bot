@@ -22,7 +22,7 @@ module.exports.run = async (bot, message, args) => {
       break;
     };
     case "list": {
-      listEvents(message, guildConfig, args[1]);
+      listEvents(message, guildConfig);
       break;
     };
     default: {

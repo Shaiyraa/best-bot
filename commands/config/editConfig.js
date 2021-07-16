@@ -5,16 +5,18 @@ const validateRole = require('../../utils/validators/validateRole');
 const validateChannel = require('../../utils/validators/validateChannel');
 const validateContent = require("../../utils/validators/validateContent");
 
-module.exports = async (message) => {
+module.exports = async (message, param) => {
 
   // 1. CHECK IF CONFIG EXISTS
   const guildConfig = await isGuildInDB(message);
   if (!guildConfig) return;
 
-  // 2. ASK WHAT TO UPDATE
-  message.channel.send('What do you want to update (memberRole, officerRole, announcementsChannel, remindersChannel, defaultEventMessage)?');
-  let param = await validateResponse(message, "Invalid response (memberRole, officerRole, announcementsChannel, remindersChannel, defaultEventMessage)", ["memberRole", "officerRole", "announcementsChannel", "remindersChannel", "defaultEventMessage"]);
-  if (param === "exit") return message.channel.send("Bye!");
+  if (!param) {
+    // 2. ASK WHAT TO UPDATE
+    message.channel.send('What do you want to update (memberRole, officerRole, announcementsChannel, remindersChannel, defaultEventMessage)?');
+    param = await validateResponse(message, "Invalid response (memberRole, officerRole, announcementsChannel, remindersChannel, defaultEventMessage)", ["memberRole", "officerRole", "announcementsChannel", "remindersChannel", "defaultEventMessage"]);
+    if (param === "exit") return message.channel.send("Bye!");
+  }
 
   // 3. ASK FOR VALUE
   let value;
@@ -54,12 +56,15 @@ module.exports = async (message) => {
 
       break;
     };
+    default: {
+      return message.channel.send(`I can't update ${param}.`);
+    };
   };
 
   // 4. CALL API
   let res;
   try {
-    res = await axios.patch(`http://localhost:3000/api/v1/guilds/${guildConfig._id}?${param}=${value}`);
+    res = await axios.patch(`${process.env.API_URL}/api/v1/guilds/${guildConfig._id}?${param}=${value}`);
   } catch (err) {
     console.log(err);
     return message.channel.send("There was a problem with your request. Please, try again later.");
