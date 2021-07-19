@@ -9,6 +9,8 @@ const validateResponse = async (message, errMessage, conditions) => {
       m = m.first();
       if (!m || m.content.startsWith(config.prefix)) {
         return response = "exit";
+      } else if (m.content.toLowerCase() === "exit") {
+        return response = "exit";
       };
       response = m.content
     })

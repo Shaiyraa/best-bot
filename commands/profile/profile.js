@@ -26,7 +26,7 @@ module.exports.run = async (bot, message, args) => {
       break;
     };
     case "show": {
-      showProfile(message, guildConfig, args[1]);
+      showProfile(message, guildConfig, args[1], args[2]);
       break;
     };
     case "list": {
@@ -47,12 +47,18 @@ module.exports.run = async (bot, message, args) => {
     };
     default: {
       sendEmbedMessage(message.channel, "Options:", [
-        "?profile create - to create new profile",
-        "?profile show [family name] - to show member's profile; use without [name] to see your own profile",
-        "?profile list - to display all profiles",
-        "?profile edit - to edit your profile",
-        "?profile private [true/false] - to set your profile to private/public",
-        "?profile delete [familyName] - to delete other profiles (officers only) or your profile"
+        "**create**",
+        "• ?profile create - to create new profile",
+        "\n**display**",
+        "• ?profile show [family name] - to show member's profile; use without [family name] to see your own profile",
+        "• ?profile show [family name] full - to show full member's profile, even though it's set to private - officers only (everyone who has access to the channel, will see it, so use it cautiously!)", // TODO: config for officers only channel and restrict the command to it
+        "• ?profile list - to display all profiles",
+        "\n**modify**",
+        "• ?profile edit - to edit your profile",
+        "• ?profile private [true/false] - to set your profile to private/public",
+        "\n**delete**",
+        "• ?profile delete [familyName] - to delete other profiles (officers only) or your profile",
+        "\nwords in [] are command params, it means you have to replace them with your own - without brackets, for example: ?profile private false"
       ]);
     };
   };
@@ -60,5 +66,5 @@ module.exports.run = async (bot, message, args) => {
 
 module.exports.help = {
   name: "profile",
-  description: "display member profiles and manage your profile"
+  description: "Display member profiles and manage your profile.\n?profile to learn more"
 };

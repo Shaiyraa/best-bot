@@ -1,7 +1,7 @@
 const Discord = require("discord.js");
 const config = require("../../config.json");
 
-module.exports = async (message) => {
+const validateStance = async (message) => {
   let response = "";
 
   const filter = m => m.author.id === message.author.id;
@@ -10,6 +10,8 @@ module.exports = async (message) => {
       m = m.first();
       if (!m || m.content.startsWith(config.prefix)) {
         return "exit";
+      } else if (m.content.toLowerCase() === "exit") {
+        return response = "exit";
       };
       response = m.content.toLowerCase();
     })
@@ -24,6 +26,7 @@ module.exports = async (message) => {
   if (config.stance.includes(response)) return response;
 
   message.channel.send("Invalid response.");
-  return await validateResponse(message);
+  return await validateStance(message);
 };
 
+module.exports = validateStance;

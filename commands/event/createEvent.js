@@ -23,6 +23,7 @@ module.exports = async (bot, message, guildConfig, date) => {
     hour = "20:00"
     // set proper date
     date = new Date(date.split(/\D/g)[2], date.split(/\D/g)[1] - 1, date.split(/\D/g)[0], hour.split(":")[0], hour.split(":")[1]);
+    if (date < Date.now()) return message.channel.send("Can't create event with past date. Try again.");
     type = "nodewar"
     count = 100
     alerts = false
@@ -31,19 +32,20 @@ module.exports = async (bot, message, guildConfig, date) => {
   } else {
     // 2b. DATE DOESN'T EXIST - ASK FOR PARAMS
 
-    message.channel.send("What is the date of the event?");
+    message.channel.send("What is the date of the event (dd/mm/yyyy)?");
     date = await validateResponseRegex(message, "Invalid date format", /^(?:(?:31(\/|-|.)(?:0?[13578]|1[02]))\1|(?:(?:29|30)(\/|-|.)(?:0?[13-9]|1[0-2])\2))(?:(?:1[6-9]|[2-9]\d)?\d{2})$|^(?:29(\/|-|.)0?2\3(?:(?:(?:1[6-9]|[2-9]\d)?(?:0[48]|[2468][048]|[13579][26])|(?:(?:16|[2468][048]|[3579][26])00))))$|^(?:0?[1-9]|1\d|2[0-8])(\/|-|.)(?:(?:0?[1-9])|(?:1[0-2]))\4(?:(?:1[6-9]|[2-9]\d)?\d{2})$/g);
     if (date === "exit") return message.channel.send("Bye!");
 
-    message.channel.send('What time is the event?');
+    message.channel.send('What time is the event (hh:mm)?');
     hour = await validateResponseRegex(message, "Invalid time.", /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/g);
     if (hour === "exit") return message.channel.send("Bye!");
 
     // set proper date
     date = new Date(date.split(/\D/g)[2], date.split(/\D/g)[1] - 1, date.split(/\D/g)[0], hour.split(":")[0], hour.split(":")[1]);
+    if (date < Date.now()) return message.channel.send("Can\'t create event with past date. Try again.");
 
-    message.channel.send('What is the type of the event? Possible types: "nodewar", "siege", "guildevent".');
-    type = await validateResponse(message, "Invalid response (nodewar, siege, guildevent)", ['nodewar', 'siege', 'guildevent']);
+    message.channel.send("What is the type of the event? Possible types: nodewar, siege, guildevent.");
+    type = await validateResponse(message, "Invalid response (options: nodewar, siege, guildevent)", ["nodewar", "siege", "guildevent"]);
     if (type === "exit") return message.channel.send("Bye!");
 
 
@@ -69,10 +71,7 @@ module.exports = async (bot, message, guildConfig, date) => {
       :
       alerts = false
   };
-
-  // TODO: put it into the function checking date instead
-  if (date < Date.now()) return message.channel.send("Can't create event with past date. Try again.");
-
+  
   // 3. SET MESSAGE CONTENT
   let content = guildConfig.defaultEventMessage;
   message.channel.send("Do you want to create a custom message (yes/no)?");
@@ -108,6 +107,9 @@ module.exports = async (bot, message, guildConfig, date) => {
 
   // 5. CREATE ICONS
   const channel = await message.guild.channels.resolve(guildConfig.announcementsChannel);
+  if (!channel) return message.channel.send("Announcements channel doesn\'t exist. Please, update the config, if you want the bot to function properly.");
+
+
   const reactionMessage = await channel.send(embed).catch(console.log);
 
   const messageId = reactionMessage.id;

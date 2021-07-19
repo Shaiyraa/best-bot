@@ -1,6 +1,6 @@
 const config = require('../../config.json');
 
-module.exports = async (message) => {
+const validateRole = async (message) => {
   let response = "";
 
   const filter = m => m.author.id === message.author.id;
@@ -8,8 +8,10 @@ module.exports = async (message) => {
     .then(m => {
       m = m.first();
       if (!m || m.content.startsWith(config.prefix)) {
-        return response = "exit"
-      }
+        return response = "exit";
+      } else if (m.content.toLowerCase() === "exit") {
+        return response = "exit";
+      };
       response = m.content
     })
     .catch((err) => {
@@ -24,5 +26,7 @@ module.exports = async (message) => {
   if (message.guild.roles.cache.get(response)) return response
 
   if (response !== "exit") message.channel.send("Invalid role.")
-  return await validateResponseRole(message)
+  return await validateRole(message)
 }
+
+module.exports = validateRole;

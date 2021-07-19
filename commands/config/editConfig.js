@@ -70,7 +70,5 @@ module.exports = async (message, param) => {
     return message.channel.send("There was a problem with your request. Please, try again later.");
   };
 
-
-
   message.channel.send("Config updated!");
 };

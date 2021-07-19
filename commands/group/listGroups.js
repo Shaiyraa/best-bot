@@ -47,7 +47,7 @@ module.exports = async (message, guildConfig) => {
         let reactionMap = reactionMessage.reactions.resolve(reaction.emoji.id) || reactionMessage.reactions.resolve(reaction.emoji.name);
         reactionMap?.users.remove(user.id);
       };
-      return emojis.includes(reaction.emoji.name);
+      return (emojis.includes(reaction.emoji.name) && (user.id === message.author.id))
     };
 
     const collector = reactionMessage.createReactionCollector(filter, { max: 1, dispose: true });
@@ -55,17 +55,16 @@ module.exports = async (message, guildConfig) => {
 
       switch (reaction.emoji.name) {
         case config.deleteEmoji: {
-          await deleteGroup(message, guildConfig, group.name)
+          await deleteGroup(message, guildConfig, group.name);
           break;
         };
 
         case config.editEmoji: {
-          await editGroup(message, guildConfig, group.name)
+          await editGroup(message, guildConfig, group.name);
           break;
         };
       };
     });
-
-  })
+  });
 };
 

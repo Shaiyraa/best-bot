@@ -1,5 +1,6 @@
 const Discord = require('discord.js');
 const createGroup = require('./createGroup');
+const showGroup = require('./showGroup');
 const listGroups = require('./listGroups');
 const editGroup = require('./editGroup');
 const deleteGroup = require('./deleteGroup');
@@ -24,6 +25,10 @@ module.exports.run = async (bot, message, args) => {
       createGroup(message, guildConfig, args[1]);
       break;
     };
+    case "show": {
+      showGroup(message, guildConfig, args[1]);
+      break;
+    };
     case "list": {
       listGroups(message, guildConfig);
       break;
@@ -42,12 +47,18 @@ module.exports.run = async (bot, message, args) => {
     };
     default: {
       sendEmbedMessage(message.channel, "Options:", [
-        "?group create - to create new group",
-        "?group edit - to edit a group",
-        "?group delete - to delete a group",
-        "?group list - to manage existing groups",
-        "?group assign [group] [familyName] - to assign group to one guild members",
-        "?group assign [group] - to assign group to many guild members"
+        "**create**",
+        "• ?group create - to create new group",
+        "\n**display**",
+        "• ?group show [group] - to show group details",
+        "• ?group list - to manage the groups",
+        "\n**modify**",
+        "• ?group edit [group] - to edit group details",
+        "\n**delete**",
+        "• ?group delete [group] - to delete a group",
+        "\n**other**",
+        "• ?group assign [group] [familyName] - to assign group to one guild members",
+        "• ?group assign [group] - to assign group to many guild members"
       ]);
     };
   };
@@ -55,5 +66,5 @@ module.exports.run = async (bot, message, args) => {
 
 module.exports.help = {
   name: "group",
-  description: "manage nodewar groups"
+  description: "Manage nodewar groups. Restricted to officers only.\n?group to learn more"
 };

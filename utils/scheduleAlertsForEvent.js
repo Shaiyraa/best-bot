@@ -39,13 +39,18 @@ module.exports = async (bot, guildConfig, event, alerts) => {
       switch (alert.type) {
         case "undecided": {
           if (!resEvent.undecidedMembers.length) return;
-          const arrayOfUndecidedTags = resEvent.undecidedMembers.map(member => `<@${member.id}>`).join(" ")
-          const guild = await bot.guilds.fetch(guildConfig.id)
-          const remindersChannel = await guild.channels.cache.get(resEvent.guild.remindersChannel)
-          const announcementsChannel = await guild.channels.cache.get(resEvent.guild.announcementsChannel)
-          const eventMessage = await announcementsChannel.messages.fetch(resEvent.messageId)
+          const arrayOfUndecidedTags = resEvent.undecidedMembers.map(member => `<@${member.id}>`).join(" ");
+          const guild = await bot.guilds.fetch(guildConfig.id);
+          
+          const remindersChannel = await guild.channels.cache.get(resEvent.guild.remindersChannel);
+          if(!remindersChannel) return guild.owner.send("Reminders channel doesn't exist anymore. Update the config, if you want the bot to function correctly.");
+         
+          const announcementsChannel = await guild.channels.cache.get(resEvent.guild.announcementsChannel);
+          if (!announcementsChannel) return guild.owner.send("Announcement channel doesn't exist anymore. Update the config, if you want the bot to function correctly.");
+          
+          const eventMessage = await announcementsChannel.messages.fetch(resEvent.messageId);
 
-          await sendEmbedMessage(remindersChannel, "There's an event starting in 2 hours! Sign up or Alish will slap you!", `[Link to the event](${eventMessage.url})`, arrayOfUndecidedTags)
+          await sendEmbedMessage(remindersChannel, "There's an event starting in 2 hours! Sign up or Alish will slap you!", `[Link to the event](${eventMessage.url})`, arrayOfUndecidedTags);
 
           break;
         };
@@ -57,9 +62,9 @@ module.exports = async (bot, guildConfig, event, alerts) => {
   schedule.scheduleJob(event.date, async function () {
     let res;
     try {
-      res = await axios.delete(`${process.env.API_URL}/api/v1/events/${event._id}`)
+      res = await axios.delete(`${process.env.API_URL}/api/v1/events/${event._id}`);
     } catch (err) {
-      console.log(err)
+      console.log(err);
     };
   });
 };

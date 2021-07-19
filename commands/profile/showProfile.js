@@ -1,8 +1,9 @@
 const Discord = require('discord.js');
 const axios = require('axios');
 const isGuildInDB = require('../../utils/isGuildInDB');
+const hasRole = require('../../utils/hasRole');
 
-module.exports = async (message, guildConfig, familyName) => {
+module.exports = async (message, guildConfig, familyName, sudo) => {
 
   // if family doesn't exist, request user object by discord id first
   if (!familyName) {
@@ -37,23 +38,29 @@ module.exports = async (message, guildConfig, familyName) => {
   }
 
   if (!res.data.results) return message.channel.send("This profile doesn't exist.");
-  const user = res.data.data.users[0];
+  const member = res.data.data.users[0];
 
   // 2. DISPLAY MESSAGE
-  const embed = new Discord.MessageEmbed().setDescription(`Profile of **${user.familyName}**:`);
+  const embed = new Discord.MessageEmbed().setDescription(`Profile of **${member.familyName}**:`);
 
-  if (!user.private) {
-    embed.addField("AP:", user.regularAp, true)
-      .addField("AAP:", user.awakeningAp, true)
-      .addField("DP:", user.dp, true)
-      .addField("Level:", `99`, true)
-      .addField("Proof:", `[Link](https://media.tenor.com/images/a1505c6e6d37aa2b7c5953741c0177dc/tenor.gif)`, true);
-  } else {
-    embed.setFooter("Profile set to private");
+  if(sudo === "full") {
+     // CHECK IF OFFICER
+    const isOfficer = await hasRole(message, guildConfig.officerRole)
+    if (isOfficer) member.private = false
   };
 
-  embed.addField("Class:", `${user.characterClass === "shai" ? "" : user.stance} ${user.characterClass}`, false)
-    .addField("Nodewar Group:", `${user.group ? user.group.name : "DEFAULT"}`, true);
+  if (!member.private) {
+    embed.addField("AP:", member.regularAp, true)
+      .addField("AAP:", member.awakeningAp, true)
+      .addField("DP:", member.dp, true)
+      .addField("Level:", member.level, true)
+      .addField("Proof:", `[Link](${member.proof || "https://media.tenor.com/images/a1505c6e6d37aa2b7c5953741c0177dc/tenor.gif"})`, true);
+  } else {
+    embed.setFooter(":lock: Profile set to private");
+  };
+
+  embed.addField("Class:", `${member.characterClass === "shai" ? "" : member.stance} ${member.characterClass}`, false)
+    .addField("Nodewar Group:", `${member.group ? member.group.name : "DEFAULT"}`, true);
   //.setColor("#58de49");
 
   message.channel.send(embed);

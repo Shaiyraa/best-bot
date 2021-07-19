@@ -1,7 +1,7 @@
 const Discord = require("discord.js");
 const config = require("../../config.json");
 
-module.exports = async (message) => {
+const validateClass = async (message) => {
   let response = "";
 
   const filter = m => m.author.id === message.author.id;
@@ -10,7 +10,10 @@ module.exports = async (message) => {
       m = m.first();
       if (!m || m.content.startsWith(config.prefix)) {
         return "exit";
+      } else if (m.content.toLowerCase() === "exit") {
+        return "exit";
       };
+
       response = m.content.toLowerCase();
     })
     .catch((err) => {
@@ -32,6 +35,7 @@ module.exports = async (message) => {
   if (config.classes.includes(response)) return response;
 
   message.channel.send("This class doesn't exist");
-  return await validateResponse(message);
+  return await validateClass(message);
 };
 
+module.exports = validateClass;

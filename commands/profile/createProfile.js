@@ -34,9 +34,12 @@ module.exports = async (message, guildConfig) => {
   const familyName = await validateResponseRegex(message, "Invalid format", /^([a-z]|[A-Z]|_)[^0-9]+$/g);
   if (familyName === "exit") return message.channel.send("Bye!");
 
-  message.channel.send("What is your character's class?");
+  message.channel.send("What is your character\ 's class?");
   const characterClass = await validateClass(message);
   if (characterClass === "exit") return message.channel.send("Bye!");
+
+  // easter egg
+  if(characterClass === "musa") message.channel.send("lmao");
 
   let stance;
   if (characterClass === "shai") {
@@ -48,18 +51,20 @@ module.exports = async (message, guildConfig) => {
   }
 
   message.channel.send("What is your regular AP?");
-  const regularAp = await validateResponseRegex(message, "Invalid format", /^([0-9])+$/g);
+  const regularAp = await validateResponseRegex(message, "Invalid format", /^([1-9][0-9]{0,2})$/g);
   if (regularAp === "exit") return message.channel.send("Bye!");
 
   message.channel.send("What is your awakening AP?");
-  const awakeningAp = await validateResponseRegex(message, "Invalid format", /^([0-9])+$/g);
+  const awakeningAp = await validateResponseRegex(message, "Invalid format", /^([1-9][0-9]{0,2})$/g);
   if (awakeningAp === "exit") return message.channel.send("Bye!");
 
   message.channel.send("What is your DP?");
-  const dp = await validateResponseRegex(message, "Invalid format", /^([0-9])+$/g);
+  const dp = await validateResponseRegex(message, "Invalid format", /^([1-9][0-9]{0,2})$/g);
   if (dp === "exit") return message.channel.send("Bye!");
 
-  // TODO: ask for level
+  message.channel.send("What is your level?");
+  const level = await validateResponseRegex(message, "Invalid format", /^([1-9][0-9]{0,1})$/g);
+  if (level === "exit") return message.channel.send("Bye!");
 
   // 3. CREATE PROFILE
   try {
@@ -71,6 +76,7 @@ module.exports = async (message, guildConfig) => {
       regularAp,
       awakeningAp,
       dp,
+      level,
       guild: guildConfig._id
     });
   } catch (err) {

@@ -24,7 +24,7 @@ module.exports = async (message, guildConfig, param) => {
   switch (param) {
     case "ap": {
       message.channel.send(`Provide ${param.toUpperCase()} value:`);
-      value = await validateResponseRegex(message, "Invalid format", /^([0-9])+$/g);
+      value = await validateResponseRegex(message, "Invalid format", /^([1-9][0-9]{0,2})$/g);
       if (value === "exit") return message.channel.send("Bye!");
       param = "regularAp";
 
@@ -32,7 +32,7 @@ module.exports = async (message, guildConfig, param) => {
     };
     case "aap": {
       message.channel.send(`Provide ${param.toUpperCase()} value:`);
-      value = await validateResponseRegex(message, "Invalid format", /^([0-9])+$/g);
+      value = await validateResponseRegex(message, "Invalid format", /^([1-9][0-9]{0,2})$/g);
       if (value === "exit") return message.channel.send("Bye!");
       param = "awakeningAp";
 
@@ -40,7 +40,7 @@ module.exports = async (message, guildConfig, param) => {
     };
     case "dp": {
       message.channel.send(`Provide ${param.toUpperCase()} value:`);
-      value = await validateResponseRegex(message, "Invalid format", /^([0-9])+$/g);
+      value = await validateResponseRegex(message, "Invalid format", /^([1-9][0-9]{0,2})$/g);
       if (value === "exit") return message.channel.send("Bye!");
 
       break;
@@ -58,6 +58,13 @@ module.exports = async (message, guildConfig, param) => {
       value = await validateClass(message);
       if (value === "exit") return message.channel.send("Bye!");
       param = "characterClass";
+
+      break;
+    };
+    case "level": {
+      message.channel.send("What is your character's level?");
+      value = await validateResponseRegex(message, "Invalid format", /^([1-9][0-9]{0,1})$/g);
+      if (value === "exit") return message.channel.send("Bye!");
 
       break;
     };

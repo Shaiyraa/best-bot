@@ -18,7 +18,7 @@ module.exports = async (message, guildConfig) => {
   };
 
   const events = res.data.data.events;
-  if (!events.length) return message.channel.send("There are no scheduled events.");
+  if (!res.data.results) return message.channel.send("There are no scheduled events.");
 
   // 2. CREATE A MESSAGE AND LISTENER FOR EACH EVENT
   events.forEach(async event => {
@@ -48,7 +48,8 @@ module.exports = async (message, guildConfig) => {
         let reactionMap = reactionMessage.reactions.resolve(reaction.emoji.id) || reactionMessage.reactions.resolve(reaction.emoji.name);
         reactionMap?.users.remove(user.id);
       };
-      return emojis.includes(reaction.emoji.name);
+
+      return (emojis.includes(reaction.emoji.name) && (user.id === message.author.id))
     };
 
     const collector = reactionMessage.createReactionCollector(filter, { max: 1, dispose: true });
@@ -56,7 +57,7 @@ module.exports = async (message, guildConfig) => {
 
       switch (reaction.emoji.name) {
         case config.deleteEmoji: {
-          await deleteEvent(message, guildConfig, event)
+          await deleteEvent(message, guildConfig, event);
           break;
         };
         case config.editEmoji: {

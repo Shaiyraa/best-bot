@@ -15,6 +15,8 @@ module.exports = async (message, guildConfig) => {
     return message.channel.send("There was a problem with your request. Please, try again later.");
   };
 
+  if (!res.data.results) return message.channel.send("There are no users to display.");
+
   // 2. GET REQUIRED DATA
   const users = res.data.data.users;
   const membersFamily = users.map(user => user.familyName);

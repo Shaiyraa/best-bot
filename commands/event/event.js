@@ -27,8 +27,11 @@ module.exports.run = async (bot, message, args) => {
     };
     default: {
       sendEmbedMessage(message.channel, "Options:", [
-        "?event create - to create new event",
-        "?event list - to list all events and manage them"
+        "**create**",
+        "• ?event create - to create new event",
+        "• ?event create [dd/mm/yyyy] - to create new nodewar using quick setup",
+        "\n**display**",
+        "• ?event list - to display all events and manage them"
       ]);
     };
   };
@@ -36,5 +39,5 @@ module.exports.run = async (bot, message, args) => {
 
 module.exports.help = {
   name: "event",
-  description: "manage guild events"
+  description: "Manage guild events. Restricted to officers only.\n?event to learn more"
 };

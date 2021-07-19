@@ -10,8 +10,8 @@ module.exports = async (message, guildId) => {
 
     return res.data.data.guild
   } catch (err) {
-
-    if (err.response.status === 404) {
+    console.log(err)
+    if (err?.response.status === 404) {
       message.channel.send("Guild config is not set yet, please contact your guildmaster or officers.");
     } else {
       message.channel.send("There was a problem with your request. Please, try again later.");

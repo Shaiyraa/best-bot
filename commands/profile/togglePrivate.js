@@ -25,6 +25,7 @@ module.exports = async (message, guildConfig, value) => {
       }
     });
   } catch (err) {
+    if(err.response.status === 404) return message.channel.send("Profile not found.");
     console.log(err)
     return message.channel.send("There was a problem with your request. Please, try again later.");
   };

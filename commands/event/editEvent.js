@@ -65,7 +65,8 @@ module.exports = async (message, guildConfig, event) => {
   };
 
   // 3. UPDATE MESSAGE
-  const channel = await message.guild.channels.resolve(guildConfig.announcementsChannel);
+  const channel = await message.guild.channels.resolve(guildConfig.announcementsChannel)
+  if (!channel) return message.channel.send("Announcements channel doesn't exist. Please, update the config, if you want the bot to function properly.");
   let eventMessage = await channel.messages.fetch(event.messageId);
   if (!eventMessage) return message.channel.send("There was a problem with your request, as event message no longer exists.");
 
