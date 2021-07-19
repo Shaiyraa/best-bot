@@ -32,6 +32,17 @@ module.exports = async (message, guildConfig, groupName) => {
       value = await validateResponseRegex(message, "Invalid number.", /^[1-9][0-9]?$|^100$/g);
       if (value === "exit") return message.channel.send("Bye!");
 
+      // FETCH MEMBERS AND CHECK IF VALUE IS LOWER THAN THEIR COUNT
+      let resUsers;
+      try {
+      resUsers = await axios.get(`${process.env.API_URL}/api/v1/users?guild=${guildConfig._id}&group=${group._id}`);
+      } catch (err) {
+        console.log(err)
+        return message.channel.send("There was a problem with your request. Please, try again later.");
+      };
+      const membersCount = resUsers.data.results;
+      if(value < membersCount) return message.channel.send("You can\'t set size smaller than current members count!")
+
       param = "maxCount";
       break;
     };

@@ -1,6 +1,8 @@
 const Discord = require('discord.js');
 const axios = require('axios');
 const config = require('../../config.json');
+const deleteGroup = require('./deleteGroup');
+const editGroup = require('./editGroup');
 
 module.exports = async (message, guildConfig, groupName) => {
   if(!groupName) return message.channel.send("Provide a group name.");
@@ -33,7 +35,7 @@ module.exports = async (message, guildConfig, groupName) => {
 
   let memberFamilyNamesArray = "no members";
   if(members) {
-    memberFamilyNamesArray = members.map(member => member.familyName).join(" ");
+    memberFamilyNamesArray = members.map(member => member.familyName).join(", ");
   }
 
   // 3. MAKE AN EMBED
@@ -56,7 +58,7 @@ module.exports = async (message, guildConfig, groupName) => {
       let reactionMap = reactionMessage.reactions.resolve(reaction.emoji.id) || reactionMessage.reactions.resolve(reaction.emoji.name);
       reactionMap?.users.remove(user.id);
     };
-    (emojis.includes(reaction.emoji.name) && (user.id === message.author.id));
+    return (emojis.includes(reaction.emoji.name) && (user.id === message.author.id));
   };
 
   const collector = reactionMessage.createReactionCollector(filter, { max: 1, dispose: true });

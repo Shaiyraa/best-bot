@@ -135,6 +135,8 @@ module.exports = async (bot, message, guildConfig, date) => {
       messageId
     });
   } catch (err) {
+    reactionMessage.delete();
+    if(err?.response.status === 409) return message.channel.send("An event with this exact date is already created.");
     console.log(err);
     return message.channel.send("There was a problem with your request. Please, try again later.");
   };
