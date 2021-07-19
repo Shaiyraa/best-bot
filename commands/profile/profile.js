@@ -22,7 +22,8 @@ module.exports.run = async (bot, message, args) => {
 
   switch (args[0]) {
     case "create": {
-      createProfile(message, guildConfig);
+      const [first, ...otherArgs] = args
+      createProfile(message, guildConfig, ...otherArgs);
       break;
     };
     case "show": {
