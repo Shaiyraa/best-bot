@@ -9,26 +9,93 @@ const validateContent = require('../../utils/validators/validateContent');
 const validateResponseRegex = require('../../utils/validators/validateResponseRegex');
 const validateResponse = require('../../utils/validators/validateResponse');
 
-module.exports = async (bot, message, guildConfig, date) => {
+module.exports = async (bot, message, guildConfig, args) => {
 
+  let date;
   let hour;
   let type;
   let count;
   let alerts;
   let mandatory;
 
-  // 2a. DATE EXISTS - QUICK SETUP OF PARAMS
-  if (date) {
+  // ?event create 23.09.2022 20:00 nodewar 30
 
-    hour = "20:00"
+  // 2a. DATE EXISTS - QUICK SETUP OF PARAMS
+  if (args.length) {
+    // check if date exists
+    if(args[0]) {
+      if(!args[0].match(/^(?:(?:31(\/|-|.)(?:0?[13578]|1[02]))\1|(?:(?:29|30)(\/|-|.)(?:0?[13-9]|1[0-2])\2))(?:(?:1[6-9]|[2-9]\d)?\d{2})$|^(?:29(\/|-|.)0?2\3(?:(?:(?:1[6-9]|[2-9]\d)?(?:0[48]|[2468][048]|[13579][26])|(?:(?:16|[2468][048]|[3579][26])00))))$|^(?:0?[1-9]|1\d|2[0-8])(\/|-|.)(?:(?:0?[1-9])|(?:1[0-2]))\4(?:(?:1[6-9]|[2-9]\d)?\d{2})$/g)) return message.channel.send("Wrong date format (dd/mm/yyyy).");
+      date = args[0]
+    } else {
+      let today = new Date();
+      date = today.getDate() + '.' + (today.getMonth()+1) + '.' + today.getFullYear();
+    }
+    
+    // check if hour exists
+    if(args[1]) {
+      if(!args[1].match(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/g)) return message.channel.send("Wrong hour format (hh:mm).");
+      hour = args[1];
+    } else {
+      hour = "20:00";
+    };
+
     // set proper date
     date = new Date(date.split(/\D/g)[2], date.split(/\D/g)[1] - 1, date.split(/\D/g)[0], hour.split(":")[0], hour.split(":")[1]);
     if (date < Date.now()) return message.channel.send("Can't create event with past date. Try again.");
-    type = "nodewar"
-    count = 100
-    alerts = false
-    mandatory = true
+    
+    //check if type exists
+    if(args[2]) {
+      if(!["nodewar", "siege", "guildevent"].includes(args[2])) return message.channel.send("Wrong type (options: nodewar, siege, guildevent).");
+      type = args[2]
+    } else {
+      type = "nodewar";
+    };
 
+    //check if count exists
+    if(args[3]) {
+      if(!args[3].match(/^[1-9][0-9]?$|^100$/g)) return message.channel.send("Wrong max. count (1-100).");
+      count = args[3];
+    } else {
+      count = 100;
+    };
+
+    //check if alerts exists
+    if(args[4]) {
+      switch(args[4]) {
+        case "true": {
+          alerts = true;
+          break;
+        };
+        case "false": {
+          alerts = false;
+          break;
+        };
+        default: {
+          return message.channel.send("Wrong alerts value (options: true, false).");
+        };
+      };
+    } else {
+      alerts = false;
+    };
+
+    //check if mandatory exists
+    if(args[5]) {
+      switch(args[5]) {
+        case "true": {
+          mandatory = true;
+          break;
+        };
+        case "false": {
+          mandatory = false;
+          break;
+        };
+        default: {
+          return message.channel.send("Wrong mandatory value (options: true, false).");
+        };
+      };
+    } else {
+      mandatory = true;
+    };
   } else {
     // 2b. DATE DOESN'T EXIST - ASK FOR PARAMS
 
@@ -90,18 +157,7 @@ module.exports = async (bot, message, guildConfig, date) => {
 
   // 4. SEND MESSAGE TEMPLATE
   const embed = new Discord.MessageEmbed()
-    .addField("Event:", type, false)
-    .setDescription(mandatory ? "Mandatory" : "Non-mandatory")
-    .addField("Date:", date.toLocaleDateString("en-GB"), true)
-    .addField("Time:", hour, true)
-    .addField("Max. Attendance:", count, false)
-    .addField("Details:", content, false)
-    .addField("CAN\'T:", 'empty', false)
-    .addField("UNDECIDED:", 'empty', false)
-    .addField("Signed up:", `0/0`, true)
-    .addField("Can\'t:", `0/0`, true)
-    .addField("Undecided:", `0/0`, true)
-    .setColor(mandatory ? "#ff0000" : "#58de49")
+    .setDescription("Loading...")
     .setFooter("Signups CLOSED");
 
 

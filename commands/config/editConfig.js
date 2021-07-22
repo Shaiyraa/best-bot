@@ -4,6 +4,8 @@ const validateResponse = require('../../utils/validators/validateResponse');
 const validateRole = require('../../utils/validators/validateRole');
 const validateChannel = require('../../utils/validators/validateChannel');
 const validateContent = require("../../utils/validators/validateContent");
+const deleteMemberProfileFromDB = require('../../utils/deleteMemberProfileFromDB');
+const fetchAllMembersAndDeleteTheirProfiles = require('./fetchAllMembersAndDeleteTheirProfiles');
 
 module.exports = async (message, param) => {
 
@@ -13,8 +15,8 @@ module.exports = async (message, param) => {
 
   if (!param) {
     // 2. ASK WHAT TO UPDATE
-    message.channel.send('What do you want to update (memberRole, officerRole, announcementsChannel, remindersChannel, defaultEventMessage)?');
-    param = await validateResponse(message, "Invalid response (memberRole, officerRole, announcementsChannel, remindersChannel, defaultEventMessage)", ["memberRole", "officerRole", "announcementsChannel", "remindersChannel", "defaultEventMessage"]);
+    message.channel.send('What do you want to update (memberRole, botmasterRole, announcementsChannel, remindersChannel, defaultEventMessage)?');
+    param = await validateResponse(message, "Invalid response (memberRole, botmasterRole, announcementsChannel, remindersChannel, defaultEventMessage)", ["memberRole", "officerRole", "announcementsChannel", "remindersChannel", "defaultEventMessage"]);
     if (param === "exit") return message.channel.send("Bye!");
   }
 
@@ -22,14 +24,15 @@ module.exports = async (message, param) => {
   let value;
   switch (param) {
     case "memberRole": {
-      message.channel.send("Tag the member role:");
+      message.channel.send("Tag the member role (be careful, this will cause all the member profiles to be deleted!):");
       value = await validateRole(message);
       if (value === "exit") return message.channel.send("Bye!");
 
+      await fetchAllMembersAndDeleteTheirProfiles(guildConfig._id)
       break;
     };
     case "officerRole": {
-      message.channel.send("Tag the officer role:");
+      message.channel.send("Tag the bot master role:");
       value = await validateRole(message);
       if (value === "exit") return message.channel.send("Bye!");
 

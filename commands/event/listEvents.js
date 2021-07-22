@@ -24,11 +24,13 @@ module.exports = async (message, guildConfig) => {
   events.forEach(async event => {
     const totalMemberCount = event.undecidedMembers.length + event.yesMembers.length + event.noMembers.length;
 
+    const date = new Date(event.date)
     const embed = new Discord.MessageEmbed()
-      .addField("Event:", event.type, false)
+      .addField("Event:", event.type, true)
       .setDescription(event.mandatory ? "Mandatory" : "Non-mandatory")
-      .addField("Date:", new Date(event.date).toLocaleDateString("en-GB"), true)
-      .addField("Time:", event.hour, true)
+      .addField("Date:", `<t:${date.getTime() / 1000}>`, true)
+      .addField("Starts in:", `<t:${date.getTime() / 1000}:R>`, true)
+      //.addField("Time:", event.hour, true)
       .addField("Details:", event.content, false)
       .addField("Signed up:", `${event.yesMembers.length}/${totalMemberCount}`, true)
       .addField("Can\'t:", `${event.noMembers.length}/${totalMemberCount}`, true)

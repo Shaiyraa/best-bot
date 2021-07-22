@@ -5,7 +5,7 @@ const validateClass = require('../../utils/validators/validateClass');
 const validateStance = require('../../utils/validators/validateStance');
 const config = require('../../config.json');
 
-module.exports = async (message, guildConfig, ...params ) => {
+module.exports = async (message, guildConfig, params) => {
   // 1. CHECK IF PROFILE ALREADY EXISTS
   let res;
   try {
@@ -17,6 +17,8 @@ module.exports = async (message, guildConfig, ...params ) => {
       }
     });
 
+    if(res.data.data.user) return message.channel.send("This profile already exists.");
+
   } catch (err) {
     // do stuff only if response is other than not found
     if (err?.response.status !== 404) {
@@ -25,17 +27,16 @@ module.exports = async (message, guildConfig, ...params ) => {
     } 
   };
 
-  let familyName
-  let characterClass
-  let stance
-  let regularAp
-  let awakeningAp
-  let dp
-  let level
+  let familyName;
+  let characterClass;
+  let stance;
+  let regularAp;
+  let awakeningAp;
+  let dp;
+  let level;
 
   // 2a. CHECK IF PARAMS ARE VALID
-  if(params) {
-
+  if(params.length) {
     familyName = params[0]
     if(!familyName.match(/^([a-z]|[A-Z]|_)[^0-9]+$/g)) return message.channel.send("Invalid family name format"); 
 
@@ -73,41 +74,41 @@ module.exports = async (message, guildConfig, ...params ) => {
     }
 
   } else {
-  // 2b. ASK FOR PARAMS
-  message.channel.send("What is your family name?");
-  familyName = await validateResponseRegex(message, "Invalid format", /^([a-z]|[A-Z]|_)[^0-9]+$/g);
-  if (familyName === "exit") return message.channel.send("Bye!");
+    // 2b. ASK FOR PARAMS
+    message.channel.send("What is your family name?");
+    familyName = await validateResponseRegex(message, "Invalid format", /^([a-z]|[A-Z]|_)[^0-9]+$/g);
+    if (familyName === "exit") return message.channel.send("Bye!");
 
-  message.channel.send("What is your character\ 's class?");
-  characterClass = await validateClass(message);
-  if (characterClass === "exit") return message.channel.send("Bye!");
+    message.channel.send("What is your character\ 's class?");
+    characterClass = await validateClass(message);
+    if (characterClass === "exit") return message.channel.send("Bye!");
 
-  // class easter eggs
-  if(characterClass === "musa") message.channel.send("lmao");
+    // class easter eggs
+    if(characterClass === "musa") message.channel.send("lmao");
 
-  let stance = "awakening"
-  if (characterClass !== "shai") {
-    message.channel.send("Do you play awakening or succession?");
-    stance = await validateStance(message);
-    if (stance === "exit") return message.channel.send("Bye!");
+    stance = "awakening"
+    if (characterClass !== "shai") {
+      message.channel.send("Do you play awakening or succession?");
+      stance = await validateStance(message);
+      if (stance === "exit") return message.channel.send("Bye!");
+    }
+
+    message.channel.send("What is your regular AP?");
+    regularAp = await validateResponseRegex(message, "Invalid format", /^([1-9][0-9]{0,2})$/g);
+    if (regularAp === "exit") return message.channel.send("Bye!");
+
+    message.channel.send("What is your awakening AP?");
+    awakeningAp = await validateResponseRegex(message, "Invalid format", /^([1-9][0-9]{0,2})$/g);
+    if (awakeningAp === "exit") return message.channel.send("Bye!");
+
+    message.channel.send("What is your DP?");
+    dp = await validateResponseRegex(message, "Invalid format", /^([1-9][0-9]{0,2})$/g);
+    if (dp === "exit") return message.channel.send("Bye!");
+
+    message.channel.send("What is your level?");
+    level = await validateResponseRegex(message, "Invalid format", /^([1-9][0-9]{0,1})$/g);
+    if (level === "exit") return message.channel.send("Bye!");
   }
-
-  message.channel.send("What is your regular AP?");
-  regularAp = await validateResponseRegex(message, "Invalid format", /^([1-9][0-9]{0,2})$/g);
-  if (regularAp === "exit") return message.channel.send("Bye!");
-
-  message.channel.send("What is your awakening AP?");
-  awakeningAp = await validateResponseRegex(message, "Invalid format", /^([1-9][0-9]{0,2})$/g);
-  if (awakeningAp === "exit") return message.channel.send("Bye!");
-
-  message.channel.send("What is your DP?");
-  dp = await validateResponseRegex(message, "Invalid format", /^([1-9][0-9]{0,2})$/g);
-  if (dp === "exit") return message.channel.send("Bye!");
-
-  message.channel.send("What is your level?");
-  level = await validateResponseRegex(message, "Invalid format", /^([1-9][0-9]{0,1})$/g);
-  if (level === "exit") return message.channel.send("Bye!");
-}
 
   // 3. CREATE PROFILE
   try {

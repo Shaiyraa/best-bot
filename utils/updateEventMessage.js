@@ -13,6 +13,7 @@ module.exports = async (event, eventMessage) => {
     signupStatus = "OPEN";
   }
 
+  const date = new Date(event.date).getTime() / 1000
   // 3a. Create new embed object
   const embed = {
     color: event.mandatory ? "#ff0000" : "#58de49",
@@ -21,27 +22,27 @@ module.exports = async (event, eventMessage) => {
       text: `Signups ${signupStatus}`
     },
     fields: [{
-      name: "Event",
+      name: "Event:",
       value: event.type,
-      inline: false,
-    },
-    {
-      name: "Date",
-      value: new Date(event.date).toLocaleDateString("en-GB"),
       inline: true,
     },
     {
-      name: "Time",
-      value: event.hour,
+      name: "Date:",
+      value: `<t:${date}>`,
       inline: true,
     },
     {
-      name: "Max. Attendance",
+      name: "Starts in:",
+      value: `<t:${date}:R>`,
+      inline: true,
+    },
+    {
+      name: "Max. Attendance:",
       value: event.maxCount,
       inline: false,
     },
     {
-      name: "Details",
+      name: "Details:",
       value: event.content
     }]
   };

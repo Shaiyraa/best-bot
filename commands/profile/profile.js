@@ -5,6 +5,8 @@ const listProfiles = require("./listProfiles");
 const editProfile = require("./editProfile");
 const togglePrivate = require("./togglePrivate");
 const deleteProfile = require("./deleteProfile");
+
+const config = require('../../config.json');
 const isGuildInDB = require('../../utils/isGuildInDB')
 const sendEmbedMessage = require("../../utils/sendEmbedMessage");
 const hasRole = require('../../utils/hasRole');
@@ -23,7 +25,7 @@ module.exports.run = async (bot, message, args) => {
   switch (args[0]) {
     case "create": {
       const [first, ...otherArgs] = args
-      createProfile(message, guildConfig, ...otherArgs);
+      createProfile(message, guildConfig, otherArgs);
       break;
     };
     case "show": {
@@ -35,7 +37,7 @@ module.exports.run = async (bot, message, args) => {
       break;
     };
     case "edit": {
-      editProfile(message, guildConfig, args[1]);
+      editProfile(message, guildConfig, args[1], args[2]);
       break;
     };
     case "private": {
@@ -47,20 +49,83 @@ module.exports.run = async (bot, message, args) => {
       break;
     };
     default: {
-      sendEmbedMessage(message.channel, "Options:", [
+      const basicOptions = [
         "**create**",
-        "• ?profile create - to create new profile",
+        "• `?profile create` - to create new profile",
+
         "\n**display**",
-        "• ?profile show [family name] - to show member's profile; use without [family name] to see your own profile",
-        "• ?profile show [family name] full - to show full member's profile, even though it's set to private - officers only (everyone who has access to the channel, will see it, so use it cautiously!)", // TODO: config for officers only channel and restrict the command to it
-        "• ?profile list - to display all profiles",
+        "• `?profile show` - to show your own profile",
+        "• `?profile show [family name]` - to show member's profile",
+        "• `?profile list` - to display all profiles",
+
         "\n**modify**",
-        "• ?profile edit - to edit your profile",
-        "• ?profile private [true/false] - to set your profile to private/public",
+        "• `?profile edit` - to edit your profile",
+        "• `?profile private [true/false]` - to set your profile to private/public",
+
+        "\n**BOT MASTER ZONE**",
+        "**display**",
+        "• `?profile show [family name] full` - to show full member's profile, even though it's set to private - officers only (everyone who has access to the channel, will see it, so use it cautiously!)", // TODO: config for officers only channel and restrict the command to it
+
         "\n**delete**",
-        "• ?profile delete [familyName] - to delete other profiles (officers only) or your profile",
+        "• `?profile delete [familyName]` - to delete other profiles (officers only) or your profile",
+
         "\nwords in [] are command params, it means you have to replace them with your own - without brackets, for example: ?profile private false"
-      ]);
+      ];
+
+      // 1. SEND MESSAGE
+      const embed = new Discord.MessageEmbed()
+        .setTitle("Options")
+        .setDescription(basicOptions)
+        .setFooter(`click on the icon to see options for advanced users`);
+
+      const helpMessage = await message.channel.send(embed)
+
+      // 2. REACT WITH DUDE WITH TOOL
+      await helpMessage.react(config.advancedUserEmoji)
+
+      // 3. CREATE LISTENER
+      const filter = (reaction, user) => {
+        if (reaction.emoji.name !== config.advancedUserEmoji) {
+          let reactionMap = reactionMessage.reactions.resolve(reaction.emoji.id) || reactionMessage.reactions.resolve(reaction.emoji.name);
+          reactionMap?.users.remove(user.id);
+        };
+        return reaction.emoji.name === config.advancedUserEmoji
+      };
+    
+      const collector = helpMessage.createReactionCollector(filter, { max: 1, dispose: true });
+      collector.on('collect', async (reaction, user) => {
+
+        const advancedOptions = [
+          "**create**",
+          "• `?profile create` - to create new profile",
+          "• `?profile create [family name] [class] [ap] [aap] [dp] [lvl]` - to create new profile using quick setup",
+
+          "\n**display**",
+          "• `?profile show` - to show your own profile",
+          "• `?profile show [family name]` - to show member's profile",
+          "• `?profile list` - to display all profiles",
+
+          "\n**modify**",
+          "• `?profile edit` - to edit your profile",
+          "• `?profile edit [param] [value]` - to edit your profile quicker way",
+          "• `?profile private [true/false]` - to set your profile to private/public",
+
+          "\n**BOT MASTER ZONE**",
+          "**display**",
+          "• `?profile show [family name] full` - to show full member's profile, even though it's set to private - bot masters only (everyone who has access to the channel, will see it, so use it cautiously!)", // TODO: config for officers only channel and restrict the command to it
+
+          "\n**delete**",
+          "• `?profile delete [familyName]` - to delete other profiles (bot masters only) or your profile",
+        ]
+
+        const advancedEmbed = new Discord.MessageEmbed()
+        .setTitle("Advanced Options")
+        .setDescription(advancedOptions);
+        
+        // 4. EDIT MESSAGE WITH ADVANCED STUFF
+        helpMessage.edit(advancedEmbed);
+        helpMessage.reactions.removeAll();
+      });
     };
   };
 };

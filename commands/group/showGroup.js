@@ -8,9 +8,10 @@ module.exports = async (message, guildConfig, groupName) => {
   if(!groupName) return message.channel.send("Provide a group name.");
 
   // 1a. SEE IF THE GROUP IS IN GUILDCONFIG
-  let group = guildConfig.groups.filter(group => group.name === groupName.toUpperCase())
-  group = group[0];
+  const groups = guildConfig.groups.filter(group => group.name === groupName.toUpperCase())
+  const group = groups[0];
   if(!group) return message.channel.send("This group doesn't exist.");
+  
   // 2b. FETCH THE GROUP
   let res;
   try {
@@ -34,7 +35,7 @@ module.exports = async (message, guildConfig, groupName) => {
   const members = resUsers.data.data.users;
 
   let memberFamilyNamesArray = "no members";
-  if(members) {
+  if(resUsers.data.results) {
     memberFamilyNamesArray = members.map(member => member.familyName).join(", ");
   }
 

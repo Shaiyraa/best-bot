@@ -15,6 +15,7 @@
   "mandatoryEmoji": "❕",
   "alertsEmoji": "📢",
   "contentEmoji": "📰",
+  "advancedUserEmoji": "🧑‍🔧",
   "classes": [
     "archer",
     "berserker",

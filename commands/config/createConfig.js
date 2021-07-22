@@ -26,11 +26,11 @@ module.exports = async (message) => {
   };
 
   // 3. ASK FOR PARAMS
-  message.channel.send("Tag guild member role:");
+  message.channel.send("Tag guild member role (be careful, editing this role later will cause all the member profiles to be deleted!):");
   let memberRoleTag = await validateRole(message);
   if (memberRoleTag === "exit") return message.channel.send("Bye!");
 
-  message.channel.send("Tag guild officer role:")
+  message.channel.send("Tag bot master (the people who will use advanced commands) role:")
   let officerRoleTag = await validateRole(message);
   if (officerRoleTag === "exit") return message.channel.send("Bye!");
 
