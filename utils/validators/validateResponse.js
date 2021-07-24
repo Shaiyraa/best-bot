@@ -1,3 +1,4 @@
+const logger = require('../../logger');
 const config = require("../../config.json");
 
 const validateResponse = async (message, errMessage, conditions) => {
@@ -16,7 +17,16 @@ const validateResponse = async (message, errMessage, conditions) => {
     })
     .catch((err) => {
       response = "exit"
-      console.log(err)
+      logger.log({
+        level: 'error',
+        timestamp: Date.now(),
+        commandAuthor: {
+          id: message.author.id,
+          username: message.author.username,
+          tag: message.author.tag
+        },
+        message: err
+      });
     });
 
   if (conditions.includes(response) || response === "exit") {

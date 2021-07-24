@@ -1,4 +1,5 @@
 const axios = require('axios');
+const logger = require('../../logger');
 const validateResponseRegex = require('../../utils/validators/validateResponseRegex');
 
 module.exports = async (message, guildConfig, groupName, size) => {
@@ -30,7 +31,16 @@ module.exports = async (message, guildConfig, groupName, size) => {
       maxCount: size
     });
   } catch (err) {
-    console.log(err)
+    logger.log({
+      level: 'error',
+      timestamp: Date.now(),
+      commandAuthor: {
+        id: message.author.id,
+        username: message.author.username,
+        tag: message.author.tag
+      },
+      message: err
+    });
     if (err.response.status === 403) return message.channel.send("A group with this name already exists.");
     return message.channel.send("There was a problem with your request. Please, try again later.");
   };

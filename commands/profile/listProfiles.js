@@ -1,5 +1,5 @@
-const Discord = require('discord.js');
 const axios = require('axios');
+const logger = require('../../logger');
 const isGuildInDB = require('../../utils/isGuildInDB');
 
 module.exports = async (message, guildConfig, sortBy, isAsc) => {
@@ -53,7 +53,16 @@ module.exports = async (message, guildConfig, sortBy, isAsc) => {
   try {
     res = await axios.get(`${process.env.API_URL}/api/v1/users/?guild=${guildConfig._id}&sort=${isAsc ? "" : "-"}${sortBy}`);
   } catch (err) {
-    console.log(err)
+    logger.log({
+      level: 'error',
+      timestamp: Date.now(),
+      commandAuthor: {
+        id: message.author.id,
+        username: message.author.username,
+        tag: message.author.tag
+      },
+      message: err
+    });
     return message.channel.send("There was a problem with your request. Please, try again later.");
   };
 

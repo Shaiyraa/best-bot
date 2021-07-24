@@ -1,4 +1,5 @@
 const axios = require('axios');
+const logger = require('./logger');
 const config = require('./config.json');
 const updateEventMessage = require('./utils/updateEventMessage');
 const scheduleAlertsForEvent = require('./utils/scheduleAlertsForEvent');
@@ -9,7 +10,16 @@ const setEventListenersAndScheduleAlerts = async bot => {
   try {
     res = await axios.get(`${process.env.API_URL}/api/v1/events?date[gte]=${Date.now()}`);
   } catch (err) {
-    return console.log(err);
+    return logger.log({
+      level: 'error',
+      timestamp: Date.now(),
+      commandAuthor: {
+        id: message.author.id,
+        username: message.author.username,
+        tag: message.author.tag
+      },
+      message: err
+    });
   };
 
   const events = res.data.data.events;
@@ -70,7 +80,16 @@ const setEventListenersAndScheduleAlerts = async bot => {
           await updateEventMessage(res.data.data.event, eventMessage);
 
         } catch (err) {
-          console.log(err);
+          logger.log({
+            level: 'error',
+            timestamp: Date.now(),
+            commandAuthor: {
+              id: message.author.id,
+              username: message.author.username,
+              tag: message.author.tag
+            },
+            message: err
+          });
 
           if (err.response.status === 403) {
             user.send(err.response.data.message);

@@ -1,4 +1,5 @@
 const Discord = require("discord.js");
+const logger = require('../../logger');
 const config = require("../../config.json");
 
 const validateStance = async (message) => {
@@ -16,7 +17,16 @@ const validateStance = async (message) => {
       response = m.content.toLowerCase();
     })
     .catch((err) => {
-      console.log(err)
+      logger.log({
+        level: 'error',
+        timestamp: Date.now(),
+        commandAuthor: {
+          id: message.author.id,
+          username: message.author.username,
+          tag: message.author.tag
+        },
+        message: err
+      });
       return "exit"
     });
 

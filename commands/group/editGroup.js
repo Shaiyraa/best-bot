@@ -1,4 +1,5 @@
 const axios = require('axios');
+const logger = require('../../logger');
 const validateResponseRegex = require('../../utils/validators/validateResponseRegex');
 const validateResponse = require('../../utils/validators/validateResponse');
 
@@ -46,7 +47,16 @@ module.exports = async (message, guildConfig, groupName, param, value) => {
       try {
       resUsers = await axios.get(`${process.env.API_URL}/api/v1/users?guild=${guildConfig._id}&group=${group._id}`);
       } catch (err) {
-        console.log(err)
+        logger.log({
+          level: 'error',
+          timestamp: Date.now(),
+          commandAuthor: {
+            id: message.author.id,
+            username: message.author.username,
+            tag: message.author.tag
+          },
+          message: err
+        });
         return message.channel.send("There was a problem with your request. Please, try again later.");
       };
       const membersCount = resUsers.data.results;
@@ -65,7 +75,16 @@ module.exports = async (message, guildConfig, groupName, param, value) => {
   try {
     res = await axios.patch(`${process.env.API_URL}/api/v1/groups/${group._id}?${param}=${value}`);
   } catch (err) {
-    console.log(err)
+    logger.log({
+      level: 'error',
+      timestamp: Date.now(),
+      commandAuthor: {
+        id: message.author.id,
+        username: message.author.username,
+        tag: message.author.tag
+      },
+      message: err
+    });
     return message.channel.send("There was a problem with your request. Please, try again later.");
   };
 

@@ -3,6 +3,7 @@ const axios = require('axios');
 const schedule = require('node-schedule');
 const bot = require('../bot');
 const sendEmbedMessage = require('./sendEmbedMessage');
+const logger = require('../logger');
 
 module.exports = async (bot, guildConfig, event, alerts) => {
   if (!alerts) {
@@ -13,7 +14,16 @@ module.exports = async (bot, guildConfig, event, alerts) => {
         event: event._id
       });
     } catch (err) {
-      console.log(err);
+      logger.log({
+        level: 'error',
+        timestamp: Date.now(),
+        commandAuthor: {
+          id: message.author.id,
+          username: message.author.username,
+          tag: message.author.tag
+        },
+        message: err
+      });
     };
 
     alerts = res.data.data.alerts;
@@ -29,7 +39,16 @@ module.exports = async (bot, guildConfig, event, alerts) => {
       try {
         res = await axios.get(`${process.env.API_URL}/api/v1/events/${event._id}`);
       } catch (err) {
-        console.log(err);
+        logger.log({
+          level: 'error',
+          timestamp: Date.now(),
+          commandAuthor: {
+            id: message.author.id,
+            username: message.author.username,
+            tag: message.author.tag
+          },
+          message: err
+        });
       };
 
       const resEvent = res.data.data.event
@@ -64,7 +83,16 @@ module.exports = async (bot, guildConfig, event, alerts) => {
   //   try {
   //     res = await axios.delete(`${process.env.API_URL}/api/v1/events/${event._id}`);
   //   } catch (err) {
-  //     console.log(err);
+  //     logger.log({
+    //   level: 'error',
+    //   timestamp: Date.now(),
+    //   commandAuthor: {
+    //     id: message.author.id,
+    //     username: message.author.username,
+    //     tag: message.author.tag
+    //   },
+    //   message: err
+    // });
   //   };
   // });
 };

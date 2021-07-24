@@ -1,4 +1,5 @@
 const axios = require('axios');
+const logger = require('../../logger');
 
 module.exports = async (guildId) => {
 
@@ -9,7 +10,16 @@ module.exports = async (guildId) => {
       guild: guildId
     });
   } catch (err) {
-    return console.log(err);
+    return logger.log({
+      level: 'error',
+      timestamp: Date.now(),
+      commandAuthor: {
+        id: message.author.id,
+        username: message.author.username,
+        tag: message.author.tag
+      },
+      message: err
+    });
   };
 
   if (!res.data.results) return;

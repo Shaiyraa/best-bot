@@ -1,4 +1,5 @@
 const axios = require('axios');
+const logger = require('../../logger');
 const isGuildInDB = require('../../utils/isGuildInDB')
 
 module.exports = async (message, guildConfig, value) => {
@@ -26,7 +27,16 @@ module.exports = async (message, guildConfig, value) => {
     });
   } catch (err) {
     if(err.response.status === 404) return message.channel.send("Profile not found.");
-    console.log(err)
+    logger.log({
+      level: 'error',
+      timestamp: Date.now(),
+      commandAuthor: {
+        id: message.author.id,
+        username: message.author.username,
+        tag: message.author.tag
+      },
+      message: err
+    });
     return message.channel.send("There was a problem with your request. Please, try again later.");
   };
 
@@ -39,7 +49,16 @@ module.exports = async (message, guildConfig, value) => {
       private: value
     });
   } catch (err) {
-    console.log(err)
+    logger.log({
+      level: 'error',
+      timestamp: Date.now(),
+      commandAuthor: {
+        id: message.author.id,
+        username: message.author.username,
+        tag: message.author.tag
+      },
+      message: err
+    });
     return message.channel.send("There was a problem with your request. Please, try again later.");
   };
 

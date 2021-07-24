@@ -1,6 +1,7 @@
 
 
 const axios = require('axios');
+const logger = require('../../logger');
 const confirmation = require('../../utils/validators/confirmation');
 
 module.exports = async (message, guildConfig, groupName) => {
@@ -21,7 +22,16 @@ module.exports = async (message, guildConfig, groupName) => {
   try {
     res = await axios.delete(`${process.env.API_URL}/api/v1/groups/${group._id}`);
   } catch (err) {
-    console.log(err)
+    logger.log({
+      level: 'error',
+      timestamp: Date.now(),
+      commandAuthor: {
+        id: message.author.id,
+        username: message.author.username,
+        tag: message.author.tag
+      },
+      message: err
+    });
     return message.channel.send("There was a problem with your request. Please, try again later.");
   };
 

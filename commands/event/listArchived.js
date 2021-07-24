@@ -1,5 +1,6 @@
 const Discord = require('discord.js');
 const axios = require('axios');
+const logger = require('../../logger');
 const config = require('../../config.json');
 const deleteEvent = require('./deleteEvent');
 const showStatsForEvent = require('./showStatsForEvent');
@@ -35,7 +36,16 @@ module.exports = async (message, guildConfig, pastDate) => {
       guild: guildConfig._id
     });
   } catch (err) {
-    console.log(err);
+    logger.log({
+      level: 'error',
+      timestamp: Date.now(),
+      commandAuthor: {
+        id: message.author.id,
+        username: message.author.username,
+        tag: message.author.tag
+      },
+      message: err
+    });
     return message.channel.send("There was a problem with your request. Please, try again later.");
   };
 

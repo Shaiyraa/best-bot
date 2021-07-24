@@ -39,6 +39,8 @@ module.exports.run = async (bot, message, args) => {
         "• `?event create` - to create new event",
         "\n**display**",
         "• `?event list` - to display all events and manage them",
+        "• `?event archive` - to display all past events, manage them and see their stats",
+        "• `?event archive [dd/mm/yyyy]` - to display all past events from this date, manage them and see their stats",
       ];
 
       // 1. SEND MESSAGE
@@ -70,7 +72,9 @@ module.exports.run = async (bot, message, args) => {
           "• `?event create [date: dd/mm/yyyy] [hour: hh:mm] [type] [max participants] [alerts: true/false] [mandatory: true/false]` - to create new nodewar quicker; example: _?event 20.12.2022 20:00 nodewar 30 true true_ will create a new, mandatory nodewar on december 20th 2022, with 30 max participants, that has alerts enabled",
           "• `?event create [date: dd/mm/yyyy] [hour: hh:mm] [type] [max participants]` - you can also specify only first few params and others will be filled with default values; example: _?event 20.12.2022 20:00 nodewar_ will create a new, mandatory nodewar on december 20th 2022, with 100 max participants, that has alerts disabled",
           "\n**display**",
-          "• `?event list` - to display all events and manage them"
+          "• `?event list` - to display all events and manage them",
+          "• `?event archive` - to display all past events, manage them and see their stats",
+          "• `?event archive [dd/mm/yyyy]` - to display all past events from this date, manage them and see their stats"
         ]
 
         const advancedEmbed = new Discord.MessageEmbed()

@@ -1,5 +1,6 @@
 const Discord = require("discord.js");
 const axios = require('axios');
+const logger = require('../../logger');
 const config = require('../../config.json');
 
 module.exports = async (message, guildConfig, groupName) => {
@@ -15,7 +16,16 @@ module.exports = async (message, guildConfig, groupName) => {
     resUsers = await axios.get(`${process.env.API_URL}/api/v1/users?guild=${guildConfig._id}&group=${group._id}`);
     if(!resUsers.data.results) return message.channel.send("No users belonging to this group found.");
     } catch (err) {
-      console.log(err)
+      logger.log({
+        level: 'error',
+        timestamp: Date.now(),
+        commandAuthor: {
+          id: message.author.id,
+          username: message.author.username,
+          tag: message.author.tag
+        },
+        message: err
+      });
       return message.channel.send("There was a problem with your request. Please, try again later.");
     };
     members = resUsers.data.data.users;
@@ -27,7 +37,16 @@ module.exports = async (message, guildConfig, groupName) => {
     resUsers = await axios.get(`${process.env.API_URL}/api/v1/users?guild=${guildConfig._id}`);
     if(!resUsers.data.results) return message.channel.send("No users belonging to this group found.");
     } catch (err) {
-      console.log(err)
+      logger.log({
+        level: 'error',
+        timestamp: Date.now(),
+        commandAuthor: {
+          id: message.author.id,
+          username: message.author.username,
+          tag: message.author.tag
+        },
+        message: err
+      });
       return message.channel.send("There was a problem with your request. Please, try again later.");
     };
     members = resUsers.data.data.users;

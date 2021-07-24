@@ -1,4 +1,5 @@
 const axios = require('axios');
+const logger = require('../../logger');
 const updateEventMessage = require("../../utils/updateEventMessage");
 const validateContent = require("../../utils/validators/validateContent");
 const validateResponse = require("../../utils/validators/validateResponse");
@@ -60,7 +61,16 @@ module.exports = async (message, guildConfig, event) => {
   try {
     res = await axios.patch(`${process.env.API_URL}/api/v1/events/${event._id}?${param}=${value}`);
   } catch (err) {
-    console.log(err);
+    logger.log({
+      level: 'error',
+      timestamp: Date.now(),
+      commandAuthor: {
+        id: message.author.id,
+        username: message.author.username,
+        tag: message.author.tag
+      },
+      message: err
+    });
     return message.channel.send("There was a problem with your request. Please, try again later.");
   };
 

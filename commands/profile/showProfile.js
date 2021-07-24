@@ -1,5 +1,6 @@
 const Discord = require('discord.js');
 const axios = require('axios');
+const logger = require('../../logger');
 const isGuildInDB = require('../../utils/isGuildInDB');
 const hasRole = require('../../utils/hasRole');
 
@@ -18,7 +19,16 @@ module.exports = async (message, guildConfig, familyName, sudo) => {
       });
     } catch (err) {
       if (err.response.status === 404) return message.channel.send("This profile doesn't exist. Try ?profile create");
-      console.log(err);
+      logger.log({
+        level: 'error',
+        timestamp: Date.now(),
+        commandAuthor: {
+          id: message.author.id,
+          username: message.author.username,
+          tag: message.author.tag
+        },
+        message: err
+      });
       return message.channel.send("There was a problem with your request. Please, try again later.");
     };
 
@@ -33,7 +43,16 @@ module.exports = async (message, guildConfig, familyName, sudo) => {
       url: `${process.env.API_URL}/api/v1/users?familyName=${familyName}&guild=${guildConfig._id}`
     });
   } catch (err) {
-    console.log(err);
+    logger.log({
+      level: 'error',
+      timestamp: Date.now(),
+      commandAuthor: {
+        id: message.author.id,
+        username: message.author.username,
+        tag: message.author.tag
+      },
+      message: err
+    });
     return message.channel.send("There was a problem with your request. Please, try again later.");
   }
 

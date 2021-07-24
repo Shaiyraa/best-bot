@@ -1,9 +1,10 @@
 const axios = require('axios');
+const config = require('../../config.json');
+const logger = require('../../logger');
 const isGuildInDB = require('../../utils/isGuildInDB');
 const validateResponseRegex = require('../../utils/validators/validateResponseRegex');
 const validateClass = require('../../utils/validators/validateClass');
 const validateStance = require('../../utils/validators/validateStance');
-const config = require('../../config.json');
 
 module.exports = async (message, guildConfig, params) => {
   // 1. CHECK IF PROFILE ALREADY EXISTS
@@ -22,7 +23,16 @@ module.exports = async (message, guildConfig, params) => {
   } catch (err) {
     // do stuff only if response is other than not found
     if (err?.response.status !== 404) {
-      console.log(err);
+      logger.log({
+        level: 'error',
+        timestamp: Date.now(),
+        commandAuthor: {
+          id: message.author.id,
+          username: message.author.username,
+          tag: message.author.tag
+        },
+        message: err
+      });
       return message.channel.send("There was a problem with your request. Please, try again later.");
     } 
   };
@@ -124,7 +134,16 @@ module.exports = async (message, guildConfig, params) => {
       guild: guildConfig._id
     });
   } catch (err) {
-    console.log(err);
+    logger.log({
+      level: 'error',
+      timestamp: Date.now(),
+      commandAuthor: {
+        id: message.author.id,
+        username: message.author.username,
+        tag: message.author.tag
+      },
+      message: err
+    });
     return message.channel.send("There was a problem with your request. Please, try again later.");
   };
 

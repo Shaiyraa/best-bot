@@ -7,10 +7,11 @@ dotenv.config({ path: './config.env' })
 const setEventListenersAndScheduleAlerts = require('./setEventListenersAndScheduleAlerts');
 const listenForMemberChanges = require("./listenForMemberChanges");
 const config = require("./config.json");
+const logger = require('./logger');
 
 axios.defaults.headers.common['authorization'] = `Bot ${process.env.DISCORD_TOKEN}`
 
-// create bot
+// CREATE BOT
 const bot = new Discord.Client({ disableEveryone: true });
 
 bot.on("ready", async () => {
@@ -23,7 +24,18 @@ bot.on("ready", async () => {
 bot.commands = new Discord.Collection();
 
 fs.readdir("./commands/", (err, files) => {
-  if (err) console.log(err);
+  if (err) {
+    logger.log({
+      level: 'error',
+      timestamp: Date.now(),
+      commandAuthor: {
+        id: message.author.id,
+        username: message.author.username,
+        tag: message.author.tag
+      },
+      message: err
+    });
+  }
 
   if (files.length <= 0) {
     console.log("Couldn't find commands.");

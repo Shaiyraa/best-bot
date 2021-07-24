@@ -1,5 +1,6 @@
 const Discord = require('discord.js');
 const axios = require('axios');
+const logger = require('../../logger');
 const config = require('../../config.json');
 
 const updateEventMessage = require('../../utils/updateEventMessage');
@@ -193,7 +194,16 @@ module.exports = async (bot, message, guildConfig, args) => {
   } catch (err) {
     reactionMessage.delete();
     if(err?.response.status === 409) return message.channel.send("An event with this exact date is already created.");
-    console.log(err);
+    logger.log({
+      level: 'error',
+      timestamp: Date.now(),
+      commandAuthor: {
+        id: message.author.id,
+        username: message.author.username,
+        tag: message.author.tag
+      },
+      message: err
+    });
     return message.channel.send("There was a problem with your request. Please, try again later.");
   };
 
@@ -225,7 +235,16 @@ module.exports = async (bot, message, guildConfig, args) => {
         await updateEventMessage(res.data.data.event, reactionMessage);
 
       } catch (err) {
-        console.log(err);
+        logger.log({
+          level: 'error',
+          timestamp: Date.now(),
+          commandAuthor: {
+            id: message.author.id,
+            username: message.author.username,
+            tag: message.author.tag
+          },
+          message: err
+        });
         return user.send(err.response.data.message);
       };
     };

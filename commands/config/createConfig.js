@@ -1,4 +1,5 @@
 const axios = require('axios');
+const logger = require('../../logger');
 const validateRole = require('../../utils/validators/validateRole');
 const validateChannel = require('../../utils/validators/validateChannel');
 
@@ -20,7 +21,16 @@ module.exports = async (message) => {
 
   } catch (err) {
     if (err.response.status !== 404) {
-      console.log(err);
+      logger.log({
+        level: 'error',
+        timestamp: Date.now(),
+        commandAuthor: {
+          id: message.author.id,
+          username: message.author.username,
+          tag: message.author.tag
+        },
+        message: err
+      });
       return message.channel.send("There was a problem with your request. Please, try again later.");
     };
   };
@@ -56,7 +66,17 @@ module.exports = async (message) => {
       }
     });
   } catch (err) {
-    console.log(err);
+    logger.log({
+      level: 'error',
+      timestamp: Date.now(),
+      commandAuthor: {
+        id: message.author.id,
+        username: message.author.username,
+        tag: message.author.tag
+      },
+      message: err
+    });
+    
     return message.channel.send("There was a problem with your request. Please, try again later.");
   };
 

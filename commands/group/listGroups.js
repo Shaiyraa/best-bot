@@ -2,6 +2,7 @@ const Discord = require('discord.js');
 const axios = require('axios');
 const editGroup = require('./editGroup');
 const deleteGroup = require('./deleteGroup');
+const logger = require('../../logger');
 const config = require('../../config.json');
 
 module.exports = async (message, guildConfig) => {
@@ -11,7 +12,16 @@ module.exports = async (message, guildConfig) => {
   try {
     res = await axios.get(`${process.env.API_URL}/api/v1/users?guild=${guildConfig._id}`)
   } catch (err) {
-    console.log(err);
+    logger.log({
+      level: 'error',
+      timestamp: Date.now(),
+      commandAuthor: {
+        id: message.author.id,
+        username: message.author.username,
+        tag: message.author.tag
+      },
+      message: err
+    });
     return messge.channel.send(err.response.data.message);
   };
   const users = res.data.data.users;

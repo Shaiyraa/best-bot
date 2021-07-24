@@ -1,10 +1,11 @@
 const axios = require('axios');
+const logger = require('../../logger');
+const config = require('../../config.json');
 const isUserInDB = require('../../utils/isUserInDB');
 const validateResponse = require("../../utils/validators/validateResponse");
 const validateResponseRegex = require("../../utils/validators/validateResponseRegex");
 const validateClass = require("../../utils/validators/validateClass");
 const validateStance = require("../../utils/validators/validateStance");
-const config = require('../../config.json');
 
 module.exports = async (message, guildConfig, param, value) => {
 
@@ -142,7 +143,16 @@ module.exports = async (message, guildConfig, param, value) => {
   try {
     res = await axios.patch(`${process.env.API_URL}/api/v1/users/${user._id}?${param}=${value}`);
   } catch (err) {
-    console.log(err)
+    logger.log({
+      level: 'error',
+      timestamp: Date.now(),
+      commandAuthor: {
+        id: message.author.id,
+        username: message.author.username,
+        tag: message.author.tag
+      },
+      message: err
+    });
     return message.channel.send("There was a problem with your request. Please, try again later.");
   };
 
