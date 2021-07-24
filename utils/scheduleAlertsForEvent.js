@@ -59,12 +59,12 @@ module.exports = async (bot, guildConfig, event, alerts) => {
   });
 
   // 3. SCHEDULE BASE JOB SETTING EVENT TO INACTIVE
-  schedule.scheduleJob(event.date, async function () {
-    let res;
-    try {
-      res = await axios.delete(`${process.env.API_URL}/api/v1/events/${event._id}`);
-    } catch (err) {
-      console.log(err);
-    };
-  });
+  // schedule.scheduleJob(event.date, async function () {
+  //   let res;
+  //   try {
+  //     res = await axios.delete(`${process.env.API_URL}/api/v1/events/${event._id}`);
+  //   } catch (err) {
+  //     console.log(err);
+  //   };
+  // });
 };

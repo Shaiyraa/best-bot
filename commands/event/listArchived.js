@@ -2,14 +2,36 @@ const Discord = require('discord.js');
 const axios = require('axios');
 const config = require('../../config.json');
 const deleteEvent = require('./deleteEvent');
-const editEvent = require('./editEvent');
+const showStatsForEvent = require('./showStatsForEvent');
 
-module.exports = async (message, guildConfig) => {
+module.exports = async (message, guildConfig, pastDate) => {
 
+  if(pastDate) {
+    if(!pastDate.match(/^(?:(?:31(\/|-|.)(?:0?[13578]|1[02]))\1|(?:(?:29|30)(\/|-|.)(?:0?[13-9]|1[0-2])\2))(?:(?:1[6-9]|[2-9]\d)?\d{2})$|^(?:29(\/|-|.)0?2\3(?:(?:(?:1[6-9]|[2-9]\d)?(?:0[48]|[2468][048]|[13579][26])|(?:(?:16|[2468][048]|[3579][26])00))))$|^(?:0?[1-9]|1\d|2[0-8])(\/|-|.)(?:(?:0?[1-9])|(?:1[0-2]))\4(?:(?:1[6-9]|[2-9]\d)?\d{2})$/g)) {
+      return message.channel.send("Invalid date format.");
+    }
+    pastDate = new Date(pastDate.split(/\D/g)[2], pastDate.split(/\D/g)[1] - 1, pastDate.split(/\D/g)[0], 23, 59);
+    
+    const isToday = (someDate) => {
+      const today = new Date()
+      return someDate.getDate() == today.getDate() &&
+        someDate.getMonth() == today.getMonth() &&
+        someDate.getFullYear() == today.getFullYear()
+    }
+
+    // check if the date is today
+    isToday(pastDate) ? pastDate = Date.now() : pastDate = pastDate.getTime()
+
+    if (pastDate > Date.now()) return message.channel.send("This date is not in the past.");
+
+  } else {
+    pastDate = Date.now();
+  };
+  
   // 1. GET ALL THE EVENTS FOR THIS GUILD
   let res;
   try {
-    res = await axios.get(`${process.env.API_URL}/api/v1/events?date[gte]=${Date.now()}`, {
+    res = await axios.get(`${process.env.API_URL}/api/v1/events?date[lte]=${pastDate}&sort=date`, {
       guild: guildConfig._id
     });
   } catch (err) {
@@ -18,7 +40,7 @@ module.exports = async (message, guildConfig) => {
   };
 
   const events = res.data.data.events;
-  if (!res.data.results) return message.channel.send("There are no scheduled events.");
+  if (!res.data.results) return message.channel.send("There are no past events to display.");
 
   // 2. CREATE A MESSAGE AND LISTENER FOR EACH EVENT
   events.forEach(async event => {
@@ -29,20 +51,15 @@ module.exports = async (message, guildConfig) => {
       .addField("Event:", event.type, true)
       .setDescription(event.mandatory ? "Mandatory" : "Non-mandatory")
       .addField("Date:", `<t:${date.getTime() / 1000}>`, true)
-      .addField("Starts in:", `<t:${date.getTime() / 1000}:R>`, true)
-      //.addField("Time:", event.hour, true)
-      .addField("Details:", event.content, false)
-      .addField("Signed up:", `${event.yesMembers.length}/${totalMemberCount}`, true)
-      .addField("Can\'t:", `${event.noMembers.length}/${totalMemberCount}`, true)
-      .addField("Undecided:", `${event.undecidedMembers.length}/${totalMemberCount}`, true)
+      .addField("Ended:", `<t:${date.getTime() / 1000}:R>`, true)
       .setColor(event.mandatory ? "#ff0000" : "#58de49");
 
     // send message
     const reactionMessage = await message.channel.send(embed);
 
     // set emojis
-    let emojis = [config.editEmoji, config.deleteEmoji];
-    await reactionMessage.react(config.editEmoji);
+    let emojis = [config.statsEmoji, config.deleteEmoji];
+    await reactionMessage.react(config.statsEmoji);
     await reactionMessage.react(config.deleteEmoji);
 
     const filter = (reaction, user) => {
@@ -62,11 +79,11 @@ module.exports = async (message, guildConfig) => {
           await deleteEvent(message, guildConfig, event);
           break;
         };
-        case config.editEmoji: {
-          await editEvent(message, guildConfig, event);
+        case config.statsEmoji: {
+          await showStatsForEvent(message, guildConfig, event);
           break;
         };
       };
     });
   });
-};
+}

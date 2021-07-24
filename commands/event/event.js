@@ -1,6 +1,7 @@
 const Discord = require("discord.js");
 const createEvent = require("./createEvent");
 const listEvents = require("./listEvents");
+const listArchived = require("./listArchived");
 
 const config = require('../../config.json');
 const isGuildInDB = require('../../utils/isGuildInDB');
@@ -25,6 +26,11 @@ module.exports.run = async (bot, message, args) => {
     };
     case "list": {
       listEvents(message, guildConfig);
+      break;
+    };
+    case "archive": {
+      const pastDate = args[1]
+      listArchived(message, guildConfig, pastDate);
       break;
     };
     default: {

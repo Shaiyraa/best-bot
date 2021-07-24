@@ -33,7 +33,9 @@ module.exports.run = async (bot, message, args) => {
       break;
     };
     case "list": {
-      await listProfiles(message, guildConfig);
+      const sortBy = args[1];
+      const sortMethod = args[2];
+      await listProfiles(message, guildConfig, sortBy, sortMethod);
       break;
     };
     case "edit": {
@@ -56,7 +58,7 @@ module.exports.run = async (bot, message, args) => {
         "\n**display**",
         "• `?profile show` - to show your own profile",
         "• `?profile show [family name]` - to show member's profile",
-        "• `?profile list` - to display all profiles",
+        "• `?profile list` - to display all profiles ordered by gearscore",
 
         "\n**modify**",
         "• `?profile edit` - to edit your profile",
@@ -103,7 +105,9 @@ module.exports.run = async (bot, message, args) => {
           "\n**display**",
           "• `?profile show` - to show your own profile",
           "• `?profile show [family name]` - to show member's profile",
-          "• `?profile list` - to display all profiles",
+          "• `?profile list` - to display all profiles ordered by gearscore",
+          "• `?profile list [sortBy]` - to display all profiles ordered by param (ap, aap, dp, gearscore, class, update)",
+          "• `?profile list [sortBy] [asc/desc]` - to specify also the sort method; asc/a = ascending, desc/d = descending",
 
           "\n**modify**",
           "• `?profile edit` - to edit your profile",

@@ -2,14 +2,56 @@ const Discord = require('discord.js');
 const axios = require('axios');
 const isGuildInDB = require('../../utils/isGuildInDB');
 
-module.exports = async (message, guildConfig) => {
+module.exports = async (message, guildConfig, sortBy, isAsc) => {
+
+  if(!sortBy) sortBy = "gearscore"
+  switch(isAsc) {
+    case "a":
+    case "asc": {
+      isAsc = true;
+      break;
+    };
+    case "d":
+    case "desc":
+    case undefined: {
+      isAsc = false;
+      break;
+    };
+    default: {
+      return message.channel.send("Incorrect sorting method param (options: \"asc\" or \"a\"; \"desc\" or \"d\").");
+    }
+  }
+
+  switch(sortBy) {
+    case "ap": {
+      sortBy = "regularAp";
+      break;
+    };
+    case "aap": {
+      sortBy = "awakeningAp";
+      break;
+    };
+    case "class": {
+      sortBy = "characterClass";
+      break;
+    };
+    case "update": {
+      sortBy = "lastUpdate";
+      break;
+    };
+    case "gearscore":
+    case "dp": {
+      break;
+    };
+    default: {
+      return message.channel.send(`Can\'t sort by ${sortBy}`);
+    }
+  }
 
   // 1. CALL API FOR USERS IN THE GUILD
   let res;
   try {
-    res = await axios.get(`${process.env.API_URL}/api/v1/users/`, {
-      guild: guildConfig._id
-    });
+    res = await axios.get(`${process.env.API_URL}/api/v1/users/?guild=${guildConfig._id}&sort=${isAsc ? "" : "-"}${sortBy}`);
   } catch (err) {
     console.log(err)
     return message.channel.send("There was a problem with your request. Please, try again later.");
@@ -19,16 +61,33 @@ module.exports = async (message, guildConfig) => {
 
   // 2. GET REQUIRED DATA
   const users = res.data.data.users;
-  const membersFamily = users.map(user => user.familyName);
-  const membersGs = users.map(user => user.gearscore);
-  const membersClasses = users.map(user => user.characterClass);
 
-  // 3. SEND EMBED
-  const embed = new Discord.MessageEmbed()
-    .setTitle("All user profiles:")
-    .addField("Family", membersFamily, true)
-    .addField("GS", membersGs, true)
-    .addField("Class", membersClasses, true);
+  let membersData = [`${"<FAMILY NAME>".padEnd(25, ' ')} ${"<AP>".toString().padEnd(5, ' ')} ${"<AAP>".toString().padEnd(5, ' ')} ${"<DP>".toString().padEnd(5, ' ')} ${"<GS>".toString().padEnd(5, ' ')} ${"<CLASS>".padEnd(16, ' ')} ${"<UPDATE>".padEnd(15, ' ')}\n`]
+  users.forEach(user => {
+    if(user.private !== true) {
+      let date = new Date(user.lastUpdate)
+      let day = date.getDate() < 10 ? `0${date.getDate()}` : date.getDate();
+      let month = date.getMonth() < 10 ? `0${date.getMonth() + 1}` : date.getMonth() + 1;
+      date = `${day}-${month}-${date.getFullYear()}`;
+  
+      membersData.push(`${user.familyName.padEnd(25, ' ')} ${user.regularAp.toString().padEnd(5, ' ')} ${user.awakeningAp.toString().padEnd(5, ' ')} ${user.dp.toString().padEnd(5, ' ')} ${user.gearscore.toString().padEnd(5, ' ')} ${user.characterClass.padEnd(16, ' ')} ${date.padEnd(10, ' ')}\n`);
+    }
+  })
+  users.forEach(user => {
+    if(user.private === true) {  
+      let date = new Date(user.lastUpdate)
+      let day = date.getDate() < 10 ? `0${date.getDate()}` : date.getDate();
+      let month = date.getMonth() < 10 ? `0${date.getMonth() + 1}` : date.getMonth() + 1;
+      date = `${day}-${month}-${date.getFullYear()}`;
+      
+      user.regularAp = "???";
+      user.awakeningAp = "???";
+      user.dp = "???";
 
-  message.channel.send(embed);
+      membersData.push(`${user.familyName.padEnd(25, ' ')} ${user.regularAp.toString().padEnd(5, ' ')} ${user.awakeningAp.toString().padEnd(5, ' ')} ${user.dp.toString().padEnd(5, ' ')} ${user.gearscore.toString().padEnd(5, ' ')} ${user.characterClass.padEnd(16, ' ')} ${date.padEnd(10, ' ')}\n`);
+    }
+  })
+  
+  const formattedMembersData = membersData.join('');
+  message.channel.send(`\`\`\`apache\n${formattedMembersData}\`\`\``);
 };
