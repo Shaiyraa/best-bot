@@ -10,11 +10,12 @@ const validateStance = async (message) => {
     .then(m => {
       m = m.first();
       if (!m || m.content.startsWith(config.prefix)) {
-        return "exit";
+        response = "exit";
       } else if (m.content.toLowerCase() === "exit") {
-        return response = "exit";
+        response = "exit";
+      } else {
+        response = m.content.toLowerCase();
       };
-      response = m.content.toLowerCase();
     })
     .catch((err) => {
       logger.log({
@@ -31,9 +32,9 @@ const validateStance = async (message) => {
     });
 
   if (response === "succ" || response === "s") response = "succession"
-  if (response === "awa" || response === "a") response = "awakening"
+  if (response === "awa" || response === "awk" || response === "a") response = "awakening"
 
-  if (config.stance.includes(response)) return response;
+  if (config.stance.includes(response) || response === "exit") return response;
 
   message.channel.send("Invalid response.");
   return await validateStance(message);

@@ -13,11 +13,7 @@ const setEventListenersAndScheduleAlerts = async bot => {
     return logger.log({
       level: 'error',
       timestamp: Date.now(),
-      commandAuthor: {
-        id: message.author.id,
-        username: message.author.username,
-        tag: message.author.tag
-      },
+      commandAuthor: null,
       message: err
     });
   };
@@ -80,24 +76,18 @@ const setEventListenersAndScheduleAlerts = async bot => {
           await updateEventMessage(res.data.data.event, eventMessage);
 
         } catch (err) {
+          if (err?.response?.status === 403) return user.send("You do not have permission to react or signups are closed.");
+          if (err?.response?.status === 400) return user.send("You already reacted with this icon!");
+
           logger.log({
             level: 'error',
             timestamp: Date.now(),
-            commandAuthor: {
-              id: message.author.id,
-              username: message.author.username,
-              tag: message.author.tag
-            },
+            commandAuthor: null,
             message: err
           });
+          
+          return user.send("There was a problem with your request. Please, try again later.");
 
-          if (err.response.status === 403) {
-            user.send(err.response.data.message);
-            return
-          }
-          if (err.response.status !== 400) {
-            user.send("There was a problem with your request. Please, try again later.");
-          }
         };
       };
 

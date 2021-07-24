@@ -98,5 +98,5 @@ module.exports = async (message, guildConfig, sortBy, isAsc) => {
   })
   
   const formattedMembersData = membersData.join('');
-  message.channel.send(`\`\`\`apache\n${formattedMembersData}\`\`\``);
+  message.channel.send(`\`\`\`css\n${formattedMembersData}\`\`\``);
 };

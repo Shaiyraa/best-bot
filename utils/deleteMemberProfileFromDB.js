@@ -13,11 +13,7 @@ module.exports = async (memberId, guildId, deletedBy) => {
     logger.log({
       level: 'error',
       timestamp: Date.now(),
-      commandAuthor: {
-        id: message.author.id,
-        username: message.author.username,
-        tag: message.author.tag
-      },
+      commandAuthor: null,
       message: err
     });
     return false

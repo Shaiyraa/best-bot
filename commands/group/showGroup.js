@@ -2,8 +2,8 @@ const Discord = require('discord.js');
 const axios = require('axios');
 const deleteGroup = require('./deleteGroup');
 const editGroup = require('./editGroup');
-const config = require('../../config.json');
 const logger = require('../../logger');
+const config = require('../../config.json');
 
 module.exports = async (message, guildConfig, groupName) => {
   if(!groupName) return message.channel.send("Provide a group name.");
@@ -63,13 +63,15 @@ module.exports = async (message, guildConfig, groupName) => {
   .setTitle(`Group ${resGroup.name}:`)
   .addField("Max. size:", resGroup.maxCount)
   .addField("Members count:", resUsers.data.results)
-  .addField("Members:", memberFamilyNamesArray);
+  .addField("Members:", memberFamilyNamesArray)
+  .setFooter("Click member icon to see more details about members in this group.");
 
   // 4. SEND MESSAGE
   const reactionMessage = await message.channel.send(embed);
 
   // 5. CREATE LISTENERS
-  let emojis = [config.editEmoji, config.deleteEmoji];
+  let emojis = [config.editEmoji, config.deleteEmoji, config.statsPeopleEmoji];
+  await reactionMessage.react(config.statsPeopleEmoji);
   await reactionMessage.react(config.editEmoji);
   await reactionMessage.react(config.deleteEmoji);
 
@@ -92,6 +94,44 @@ module.exports = async (message, guildConfig, groupName) => {
 
       case config.editEmoji: {
         await editGroup(message, guildConfig, group.name);
+        break;
+      };
+
+      case config.statsPeopleEmoji: {
+        // get ppl in group
+        let resUsers;
+        try {
+        resUsers = await axios.get(`${process.env.API_URL}/api/v1/users?guild=${guildConfig._id}&group=${group._id}&sort=gearscore`);
+        if(!resUsers.data.results) return message.channel.send("No users belonging to this group found.");
+        } catch (err) {
+          logger.log({
+            level: 'error',
+            timestamp: Date.now(),
+            commandAuthor: {
+              id: message.author.id,
+              username: message.author.username,
+              tag: message.author.tag
+            },
+            message: err
+          });
+          return message.channel.send("There was a problem with your request. Please, try again later.");
+        };
+        const members = resUsers.data.data.users;
+
+        // count the stats
+        let membersData = [`${"<FAMILY NAME>".padEnd(25, ' ')} ${"<AP>".toString().padEnd(5, ' ')} ${"<AAP>".toString().padEnd(5, ' ')} ${"<DP>".toString().padEnd(5, ' ')} ${"<GS>".toString().padEnd(5, ' ')} ${"<CLASS>".padEnd(16, ' ')} ${"<UPDATE>".padEnd(15, ' ')}\n`]
+        
+        members.forEach(member => {
+          let date = new Date(member.lastUpdate)
+          let day = date.getDate() < 10 ? `0${date.getDate()}` : date.getDate();
+          let month = date.getMonth() < 10 ? `0${date.getMonth() + 1}` : date.getMonth() + 1;
+          date = `${day}-${month}-${date.getFullYear()}`;
+      
+          membersData.push(`${member.familyName.padEnd(25, ' ')} ${member.regularAp.toString().padEnd(5, ' ')} ${member.awakeningAp.toString().padEnd(5, ' ')} ${member.dp.toString().padEnd(5, ' ')} ${member.gearscore.toString().padEnd(5, ' ')} ${member.characterClass.padEnd(16, ' ')} ${date.padEnd(10, ' ')}\n`);
+        })
+
+        const formattedMembersData = membersData.join('');
+        message.channel.send(`\`\`\`css\n${formattedMembersData}\`\`\``);
         break;
       };
     };

@@ -9,12 +9,12 @@ const validateChannel = async (message) => {
     .then(m => {
       m = m.first();
       if (!m || m.content.startsWith(config.prefix)) {
-        return response = "exit";
+        response = "exit";
       } else if (m.content.toLowerCase() === "exit") {
-        return response = "exit";
+        response = "exit";
+      } else {
+        response = m.content;
       };
-
-      response = m.content;
     })
     .catch((err) => {
       response = "exit";

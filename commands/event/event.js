@@ -91,5 +91,5 @@ module.exports.run = async (bot, message, args) => {
 
 module.exports.help = {
   name: "event",
-  description: "Manage guild events. Restricted to officers only.\n?event to learn more"
+  description: "Manage guild events. Restricted to bot masters only.\n?event to learn more"
 };

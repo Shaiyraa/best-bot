@@ -75,7 +75,7 @@ module.exports = async (message, guildConfig, familyName, sudo) => {
       .addField("Level:", member.level, true)
       .addField("Proof:", `[Link](${member.proof || "https://media.tenor.com/images/a1505c6e6d37aa2b7c5953741c0177dc/tenor.gif"})`, true);
   } else {
-    embed.setFooter(":lock: Profile set to private");
+    embed.setFooter("Profile set to private");
   };
 
   embed.addField("Class:", `${member.characterClass === "shai" ? "" : member.stance} ${member.characterClass}`, false)

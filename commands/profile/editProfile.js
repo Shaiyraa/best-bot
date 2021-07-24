@@ -63,10 +63,10 @@ module.exports = async (message, guildConfig, param, value) => {
     case "family": {
       if(!value) {
         message.channel.send("What is your family name?");
-        value = await validateResponseRegex(message, "Invalid format", /^([a-z]|[A-Z]|_)[^0-9]+$/g);
+        value = await validateResponseRegex(message, "Invalid format", /^([a-zA-Z][a-zA-Z_]{0,25})$/g);
         if (value === "exit") return message.channel.send("Bye!");
       } else {
-        if(!value.match(/^([a-z]|[A-Z]|_)[^0-9]+$/g)) return message.channel.send("Invalid value.");
+        if(!value.match(/^([a-zA-Z][a-zA-Z_]{0,25})$/g)) return message.channel.send("Invalid value.");
       }
     
       param = "familyName";
@@ -115,7 +115,7 @@ module.exports = async (message, guildConfig, param, value) => {
         if (value === "exit") return message.channel.send("Bye!");
       } else {
         value = value.toLowerCase();
-        if (value === "a" || value === "awa") value = "awakening"
+        if (value === "a" || value === "awk" || value === "awa") value = "awakening"
         if (value === "s" || value === "succ") value = "succession"
         if(!config.stance.includes(value)) return message.channel.send("Invalid stance.");
       }

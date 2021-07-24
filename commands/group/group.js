@@ -117,5 +117,5 @@ module.exports.run = async (bot, message, args) => {
 
 module.exports.help = {
   name: "group",
-  description: "Manage nodewar groups. Restricted to officers only.\n?group to learn more"
+  description: "Manage nodewar groups. Restricted to bot masters only.\n?group to learn more"
 };

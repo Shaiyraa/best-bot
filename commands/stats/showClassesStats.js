@@ -62,31 +62,34 @@ module.exports = async (message, guildConfig, groupName) => {
       classes[member.characterClass].apSum = classes[member.characterClass].apSum + member.regularAp;
       classes[member.characterClass].aapSum = classes[member.characterClass].aapSum + member.awakeningAp;
       classes[member.characterClass].dpSum = classes[member.characterClass].dpSum + member.dp;
+      classes[member.characterClass].gsSum = classes[member.characterClass].gsSum + member.gearscore;
     } else {
       classes[member.characterClass] = {
         count: 1,
         apSum: member.regularAp,
         aapSum: member.awakeningAp,
-        dpSum: member.dp
+        dpSum: member.dp,
+        gsSum: member.gearscore
       };
     };
   })
 //classes[characterClass]
-  let classesArray = [`${"<CLASS>".padEnd(12, ' ')} ${"<COUNT>".padEnd(7, ' ')} ${"<AP>".padEnd(5, ' ')} ${"<AAP>".padEnd(5, ' ')} ${"<DP>".padEnd(5, ' ')}\n`]
+  let classesArray = [`${"<CLASS>".padEnd(12, ' ')} ${"<COUNT>".padEnd(7, ' ')} ${"<AP>".padEnd(5, ' ')} ${"<AAP>".padEnd(5, ' ')} ${"<DP>".padEnd(5, ' ')} ${"<GS>".padEnd(5, ' ')}\n`]
   config.classes.forEach(characterClass => {
     let count = classes[characterClass] ? classes[characterClass].count : 0;
     let ap = classes[characterClass] ? Math.floor(classes[characterClass].apSum / count) : 0;
     let aap = classes[characterClass] ? Math.floor(classes[characterClass].aapSum / count) : 0;
     let dp = classes[characterClass] ? Math.floor(classes[characterClass].dpSum / count) : 0;
+    let gs = classes[characterClass] ? Math.floor(classes[characterClass].gsSum / count) : 0;
 
-    classesArray.push(`${characterClass.padEnd(12, ' ')} ${count.toString().padEnd(7, ' ')} ${ap.toString().padEnd(5, ' ')} ${aap.toString().padEnd(5, ' ')} ${dp.toString().padEnd(5, ' ')}\n`)
+    classesArray.push(`${characterClass.padEnd(12, ' ')} ${count.toString().padEnd(7, ' ')} ${ap.toString().padEnd(5, ' ')} ${aap.toString().padEnd(5, ' ')} ${dp.toString().padEnd(5, ' ')} ${gs.toString().padEnd(5, ' ')}\n`)
   });
 
-  // 2. COUNT STATS WITHIN CLASSES
-  const embed = new Discord.MessageEmbed()
-    .setTitle(groupName ? `Stats for ${groupName.toUpperCase()} group` : "Stats for the entire guild")
-    .addField("Classes:", `\`\`\`css\n${classesArray.join("")}\`\`\``, false)
-    .setColor("RANDOM")
+  // coNst embed = new Discord.MessageEmbed()
+  //   .setTitle(groupName ? `Stats for ${groupName.toUpperCase()} group` : "Stats for the entire guild")
+  //   .setDescription("CLASSES:")
+  //   .setColor("RANDOM")
 
-  message.channel.send(embed);
+  message.channel.send(groupName ? `Stats for ${groupName.toUpperCase()} group:` : "Stats for the entire guild:");
+  message.channel.send(`\`\`\`css\n${classesArray.join("")}\`\`\``);
 }

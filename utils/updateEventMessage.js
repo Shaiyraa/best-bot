@@ -1,5 +1,3 @@
-const Discord = require('discord.js');
-
 module.exports = async (event, eventMessage) => {
 
   // 2. Get additional required data

@@ -7,7 +7,7 @@ module.exports.run = async (bot, message, args) => {
 
   // 1. CHECK IF ADMIN
   if (!message.member.hasPermission("ADMINISTRATOR")) {
-    message.channel.send("Only administrators can this command.")
+    message.channel.send("Only administrators can use this command.")
     return
   }
 

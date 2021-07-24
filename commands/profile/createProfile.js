@@ -2,6 +2,7 @@ const axios = require('axios');
 const config = require('../../config.json');
 const logger = require('../../logger');
 const isGuildInDB = require('../../utils/isGuildInDB');
+const updateEventMessage = require('../../utils/updateEventMessage');
 const validateResponseRegex = require('../../utils/validators/validateResponseRegex');
 const validateClass = require('../../utils/validators/validateClass');
 const validateStance = require('../../utils/validators/validateStance');
@@ -18,7 +19,7 @@ module.exports = async (message, guildConfig, params) => {
       }
     });
 
-    if(res.data.data.user) return message.channel.send("This profile already exists.");
+    if(res.data.data.user) return message.channel.send("Your profile already exists. If you wanna modify it, try ?profile edit");
 
   } catch (err) {
     // do stuff only if response is other than not found
@@ -48,9 +49,9 @@ module.exports = async (message, guildConfig, params) => {
   // 2a. CHECK IF PARAMS ARE VALID
   if(params.length) {
     familyName = params[0]
-    if(!familyName.match(/^([a-z]|[A-Z]|_)[^0-9]+$/g)) return message.channel.send("Invalid family name format"); 
+    if(!familyName.match(/^([a-zA-Z][a-zA-Z_]{0,25})$/g)) return message.channel.send("Invalid family name format"); 
 
-    characterClass = params[1].toLowerCase()
+    characterClass = params[1]?.toLowerCase()
     if (characterClass === "zerk") characterClass = "berserker"
     if (characterClass === "dk") characterClass = "dark knight"
     if (characterClass === "guard") characterClass = "guardian"
@@ -65,16 +66,16 @@ module.exports = async (message, guildConfig, params) => {
     if(!config.classes.includes(characterClass)) return message.channel.send("Invalid class name."); 
 
     regularAp = params[2]
-    if(!regularAp.match(/^([1-9][0-9]{0,2})$/g)) return message.channel.send("Invalid regular AP."); 
+    if(!regularAp?.match(/^([1-9][0-9]{0,2})$/g)) return message.channel.send("Invalid regular AP."); 
 
     awakeningAp = params[3]
-    if(!awakeningAp.match(/^([1-9][0-9]{0,2})$/g)) return message.channel.send("Invalid awakening AP."); 
+    if(!awakeningAp?.match(/^([1-9][0-9]{0,2})$/g)) return message.channel.send("Invalid awakening AP."); 
 
     dp = params[4]
-    if(!dp.match(/^([1-9][0-9]{0,2})$/g)) return message.channel.send("Invalid DP."); 
+    if(!dp?.match(/^([1-9][0-9]{0,2})$/g)) return message.channel.send("Invalid DP."); 
 
     level = params[5]
-    if(!level.match(/^([1-9][0-9]{0,1})$/g)) return message.channel.send("Invalid level."); 
+    if(!level?.match(/^([1-9][0-9]{0,1})$/g)) return message.channel.send("Invalid level."); 
 
     stance = "awakening"
     if(characterClass !== "shai") {
@@ -86,7 +87,7 @@ module.exports = async (message, guildConfig, params) => {
   } else {
     // 2b. ASK FOR PARAMS
     message.channel.send("What is your family name?");
-    familyName = await validateResponseRegex(message, "Invalid format", /^([a-z]|[A-Z]|_)[^0-9]+$/g);
+    familyName = await validateResponseRegex(message, "Invalid format", /^([a-zA-Z][a-zA-Z_]{0,25})$/g);
     if (familyName === "exit") return message.channel.send("Bye!");
 
     message.channel.send("What is your character\ 's class?");
@@ -148,4 +149,49 @@ module.exports = async (message, guildConfig, params) => {
   };
 
   message.channel.send("Profile created! use `?profile show` to see more details");
-}
+
+  // 1. GET ALL EVENTS 
+  let resEvents;
+  try {
+    resEvents = await axios.get(`${process.env.API_URL}/api/v1/events?guild=${guildConfig._id}&date[gte]=${Date.now()}`);
+  } catch (err) {
+    return logger.log({
+      level: 'error',
+      timestamp: Date.now(),
+      commandAuthor: null,
+      message: err
+    });
+  };
+
+  if(!resEvents.data.results) return;
+  const events = resEvents.data.data.events;
+
+  events.forEach(async event => {
+    const announcementsChannel = await message.guild.channels.cache.get(guildConfig.announcementsChannel);
+    if (!announcementsChannel) return guild.owner.send("Announcement channel doesn't exist anymore. Update the config, if you want the bot to function correctly.");
+    
+    const eventMessage = await announcementsChannel.messages.fetch(event.messageId);
+    
+    // 1. make user undecided
+    let resChangeGroup
+    try {
+      resChangeGroup = await axios.patch(`${process.env.API_URL}/api/v1/events/change-group`, {
+        eventId: event._id,
+        userDiscordId: message.author.id,
+        goToGroup: "undecided"
+      });
+
+      await updateEventMessage(resChangeGroup.data.data.event, eventMessage);
+
+    } catch (err) {
+      if (err?.response?.status !== 403 && err?.response?.status !== 400) {
+        logger.log({
+          level: 'error',
+          timestamp: Date.now(),
+          commandAuthor: null,
+          message: err
+        });
+      }
+    };
+  });
+};

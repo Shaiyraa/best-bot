@@ -64,13 +64,16 @@ module.exports.run = async (bot, message, args) => {
         "• `?profile edit` - to edit your profile",
         "• `?profile private [true/false]` - to set your profile to private/public",
 
+        "\n**delete**",
+        "• `?profile delete` - to delete your profile",
+
         "\n**BOT MASTER ZONE**",
         "**display**",
-        "• `?profile show [family name] full` - to show full member's profile, even though it's set to private - officers only (everyone who has access to the channel, will see it, so use it cautiously!)", // TODO: config for officers only channel and restrict the command to it
+        "• `?profile show [family name] full` - to show full member's profile, even though it's set to private - bot masters only (everyone who has access to the channel, will see it, so use it cautiously!)", // TODO: config for bot masters only channel and restrict the command to it
 
         "\n**delete**",
-        "• `?profile delete [familyName]` - to delete other profiles (officers only) or your profile",
-
+        "• `?profile delete [familyName]` - to delete members profiles (bot masters only)",
+       
         "\nwords in [] are command params, it means you have to replace them with your own - without brackets, for example: ?profile private false"
       ];
 
@@ -114,12 +117,15 @@ module.exports.run = async (bot, message, args) => {
           "• `?profile edit [param] [value]` - to edit your profile quicker way",
           "• `?profile private [true/false]` - to set your profile to private/public",
 
+          "\n**delete**",
+          "• `?profile delete` - to delete your profile",
+
           "\n**BOT MASTER ZONE**",
           "**display**",
-          "• `?profile show [family name] full` - to show full member's profile, even though it's set to private - bot masters only (everyone who has access to the channel, will see it, so use it cautiously!)", // TODO: config for officers only channel and restrict the command to it
+          "• `?profile show [family name] full` - to show full member's profile, even though it's set to private - bot masters only (everyone who has access to the channel, will see it, so use it cautiously!)", // TODO: config for bot masters only channel and restrict the command to it
 
           "\n**delete**",
-          "• `?profile delete [familyName]` - to delete other profiles (bot masters only) or your profile",
+          "• `?profile delete [familyName]` - to delete members profiles (bot masters only)",
         ]
 
         const advancedEmbed = new Discord.MessageEmbed()

@@ -109,7 +109,7 @@ module.exports = async (message, guildConfig, groupName) => {
     .addField("AP:", ap, true)
     .addField("AAP:", aap, true)
     .addField("DP:", dp, true)
-    //.addField("Ppl below average GS:", `\`\`\`apache\n${undergearedGSArray.join("")}\`\`\``, false)
+    //.addField("Ppl below average GS:", `\`\`\`css\n${undergearedGSArray.join("")}\`\`\``, false)
     .setColor("RANDOM")
     .setFooter("shais are not counted into the stats");
 

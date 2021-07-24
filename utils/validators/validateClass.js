@@ -9,12 +9,12 @@ const validateClass = async (message) => {
     .then(m => {
       m = m.first();
       if (!m || m.content.startsWith(config.prefix)) {
-        return "exit";
+        response = "exit";
       } else if (m.content.toLowerCase() === "exit") {
-        return "exit";
+        response = "exit";
+      } else {
+        response = m.content.toLowerCase();
       };
-
-      response = m.content.toLowerCase();
     })
     .catch((err) => {
       logger.log({
@@ -27,7 +27,7 @@ const validateClass = async (message) => {
         },
         message: err
       });
-      return "exit"
+      response = "exit"
     });
 
   if (response === "zerk") response = "berserker"
@@ -41,8 +41,10 @@ const validateClass = async (message) => {
   if (response === "warr") response = "warrior"
   if (response === "cors") response = "corsair"
 
-  if (config.classes.includes(response)) return response;
-
+  if (config.classes.includes(response) || response === "exit") {
+    return response;
+  };
+ 
   message.channel.send("This class doesn't exist");
   return await validateClass(message);
 };
