@@ -28,9 +28,6 @@ module.exports = async (guildId) => {
 
   // 2. DELETE PROFILES
   members.forEach(member => {
-    console.log(`Deleting ${member.familyName}`)
-
-    // TODO: uncomment me when going prod
-    //deleteMemberProfileFromDB(member.id, guildId, "bot");
+    deleteMemberProfileFromDB(member.id, guildId, "bot");
   });
 };
