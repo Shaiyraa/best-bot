@@ -13,7 +13,7 @@
     "nodemon": "^2.0.10"
   },
   "scripts": {
-    "start": "node app.js",
+    "start": "node bot.js",
     "server": "nodemon --legacy-watch bot.js"
   },
   "author": "",
