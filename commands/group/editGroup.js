@@ -24,10 +24,10 @@ module.exports = async (message, guildConfig, groupName, param, value) => {
     case "name": {
       if(!value) {
         message.channel.send(`What is the name of the group? Current name: ${group.name}`);
-        value = await validateResponseRegex(message, "Invalid format (only letters, numbers and _ allowed).", /^([a-zA-Z][a-zA-Z_]{0,18})$/g);
+        value = await validateResponseRegex(message, "Invalid format (only letters, numbers and _ allowed).", /^([a-zA-Z][a-zA-Z0-9_]{0,18})$/g);
         if (value === "exit") return message.channel.send("Bye!");
       } else {
-        if(!value.match(/^([a-zA-Z][a-zA-Z_]{0,18})$/g)) return message.channel.send("Invalid format (only letters, numbers and _ allowed).");
+        if(!value.match(/^([a-zA-Z][a-zA-Z0-9_]{0,18})$/g)) return message.channel.send("Invalid format (only letters, numbers and _ allowed).");
       }
 
       value = value.toUpperCase();
