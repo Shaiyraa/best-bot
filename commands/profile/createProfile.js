@@ -49,11 +49,11 @@ module.exports = async (message, guildConfig, params) => {
   // 2a. CHECK IF PARAMS ARE VALID
   if(params.length) {
     familyName = params[0]
-    if(!familyName.match(/^([a-zA-Z][a-zA-Z_]{0,25})$/g)) return message.channel.send("Invalid family name format"); 
+    if(!familyName.match(/^([a-zA-Z0-9][a-zA-Z_0-9]{0,25})$/g)) return message.channel.send("Invalid family name format"); 
 
     characterClass = params[1]?.toLowerCase()
-    if (characterClass === "zerk") characterClass = "berserker"
-    if (characterClass === "dk") characterClass = "dark knight"
+    if (characterClass === "zerk" || characterClass === "zerker") characterClass = "berserker"
+    if (characterClass === "dk" || characterClass === "darkknight") characterClass = "dark knight"
     if (characterClass === "guard") characterClass = "guardian"
     if (characterClass === "hash") characterClass = "hashashin"
     if (characterClass === "kuno") characterClass = "kunoichi"
@@ -87,7 +87,7 @@ module.exports = async (message, guildConfig, params) => {
   } else {
     // 2b. ASK FOR PARAMS
     message.channel.send("What is your family name?");
-    familyName = await validateResponseRegex(message, "Invalid format", /^([a-zA-Z][a-zA-Z_]{0,25})$/g);
+    familyName = await validateResponseRegex(message, "Invalid format", /^([a-zA-Z0-9][a-zA-Z_0-9]{0,25})$/g);
     if (familyName === "exit") return message.channel.send("Bye!");
 
     message.channel.send("What is your character\ 's class?");

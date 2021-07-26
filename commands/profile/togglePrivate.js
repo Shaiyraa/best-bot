@@ -4,16 +4,28 @@ const isGuildInDB = require('../../utils/isGuildInDB')
 
 module.exports = async (message, guildConfig, value) => {
 
-  if (!value || (value !== "false" && value !== "true")) {
+  if (!value) {
     return message.channel.send(`Please, provide also the value - use ?profile private [true/false]`);
   }
 
+  value = value?.toLowerCase();
   // convert to boolean
-  if (value === "true") {
-    value = true
-  } else {
-    value = false
-  }
+  switch(value) {
+    case "true":
+    case "t": {
+      value = true;
+      break;
+    };
+    case "false":
+    case "f": {
+      value = false;
+      break;
+    };
+    default: {
+      message.channel.send("Incorrect param. Try ?profile private [true/false]");
+      break;
+    };
+  };
 
   // 1. FIND USER 
   let resUser;

@@ -30,16 +30,16 @@ const validateClass = async (message) => {
       response = "exit"
     });
 
-  if (response === "zerk") response = "berserker"
-  if (response === "dk") response = "dark knight"
-  if (response === "guard") response = "guardian"
-  if (response === "hash") response = "hashashin"
-  if (response === "kuno") response = "kunoichi"
-  if (response === "mae") response = "maehwa"
-  if (response === "sorc") response = "sorceress"
-  if (response === "valk") response = "valkyrie"
-  if (response === "warr") response = "warrior"
-  if (response === "cors") response = "corsair"
+  if (response === "zerk" || response === "zerker") response = "berserker";
+  if (response === "dk" || response === "darkknight") response = "dark knight";
+  if (response === "guard") response = "guardian";
+  if (response === "hash") response = "hashashin";
+  if (response === "kuno") response = "kunoichi";
+  if (response === "mae") response = "maehwa";
+  if (response === "sorc") response = "sorceress";
+  if (response === "valk") response = "valkyrie";
+  if (response === "warr") response = "warrior";
+  if (response === "cors") response = "corsair";
 
   if (config.classes.includes(response) || response === "exit") {
     return response;

@@ -1,8 +1,13 @@
 const axios = require('axios');
 const logger = require('../../logger');
 const isGuildInDB = require('../../utils/isGuildInDB');
+const hasRole = require('../../utils/hasRole');
 
 module.exports = async (message, guildConfig, sortBy, isAsc) => {
+
+  // 2. CHECK IF OFFICER
+  const isOfficer = await hasRole(message, guildConfig.officerRole)
+  if (!isOfficer) return message.channel.send(`Only <@&${guildConfig.officerRole}> can use this command.`, { "allowedMentions": { "users": [] } });
 
   if(!sortBy) sortBy = "gearscore"
   switch(isAsc) {
@@ -98,5 +103,16 @@ module.exports = async (message, guildConfig, sortBy, isAsc) => {
   })
   
   const formattedMembersData = membersData.join('');
-  message.channel.send(`\`\`\`css\n${formattedMembersData}\`\`\``);
+  message.channel.send(`\`\`\`css\n${formattedMembersData}\`\`\``).catch(err => {
+    logger.log({
+      level: 'error',
+      timestamp: Date.now(),
+      commandAuthor: {
+        id: message.author.id,
+        username: message.author.username,
+        tag: message.author.tag
+      },
+      message: err
+    });
+  });
 };

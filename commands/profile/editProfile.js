@@ -63,10 +63,10 @@ module.exports = async (message, guildConfig, param, value) => {
     case "family": {
       if(!value) {
         message.channel.send("What is your family name?");
-        value = await validateResponseRegex(message, "Invalid format", /^([a-zA-Z][a-zA-Z_]{0,25})$/g);
+        value = await validateResponseRegex(message, "Invalid format", /^([a-zA-Z0-9][a-zA-Z_0-9]{0,25})$/g);
         if (value === "exit") return message.channel.send("Bye!");
       } else {
-        if(!value.match(/^([a-zA-Z][a-zA-Z_]{0,25})$/g)) return message.channel.send("Invalid value.");
+        if(!value.match(/^([a-zA-Z0-9][a-zA-Z_0-9]{0,25})$/g)) return message.channel.send("Invalid value.");
       }
     
       param = "familyName";
@@ -79,8 +79,8 @@ module.exports = async (message, guildConfig, param, value) => {
         if (value === "exit") return message.channel.send("Bye!");
       } else {
         value = value.toLowerCase();
-        if (value === "zerk") value = "berserker"
-        if (value === "dk") value = "dark knight"
+        if (value === "zerk" || value === "zerker") value = "berserker"
+        if (value === "dk" || value === "darkknight") value = "dark knight"
         if (value === "guard") value = "guardian"
         if (value === "hash") value = "hashashin"
         if (value === "kuno") value = "kunoichi"
