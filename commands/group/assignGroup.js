@@ -65,7 +65,7 @@ module.exports = async (message, guildConfig, groupName, familyName) => {
   } else {
     // 3b. ASK FOR FAMILY NAMES
     message.channel.send("Provide the family names separated by commas.");
-    const familyNames = await validateResponseRegex(message, "Invalid format.", /^[a-zA-Z _]+$/g);
+    const familyNames = await validateResponseRegex(message, "Invalid format.",  /^[a-zA-Z0-9_]{0,18}$/g);
     if (familyNames === "exit") {
       message.channel.send("Bye!");
       return;
