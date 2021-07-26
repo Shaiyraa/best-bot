@@ -101,9 +101,24 @@ module.exports = async (message, guildConfig, sortBy, isAsc) => {
       membersData.push(`${user.familyName.padEnd(25, ' ')} ${user.regularAp.toString().padEnd(5, ' ')} ${user.awakeningAp.toString().padEnd(5, ' ')} ${user.dp.toString().padEnd(5, ' ')} ${user.gearscore.toString().padEnd(5, ' ')} ${user.characterClass.padEnd(16, ' ')} ${date.padEnd(10, ' ')}\n`);
     }
   })
-  
-  const formattedMembersData = membersData.join('');
-  message.channel.send(`\`\`\`css\n${formattedMembersData}\`\`\``).catch(err => {
+  let array1 = membersData.slice(0, 19);
+  let array2 = membersData.slice(20, 39);
+  let array3 = membersData.slice(40, 59);
+  let array4 = membersData.slice(60, 79);
+  let array5 = membersData.slice(80, 99);
+
+  console.log(array1)
+  let arrayOfArrays = [];
+  arrayOfArrays.push(array1);
+  array2.length ? arrayOfArrays.push(array2) : "";
+  array3.length ? arrayOfArrays.push(array3) : "";
+  array4.length ? arrayOfArrays.push(array4) : "";
+  array5.length ? arrayOfArrays.push(array5) : "";
+ // const formattedMembersData = membersData.join('');
+ 
+ arrayOfArrays.forEach(arr => {
+   let joinedArr = arr.join(" ")
+  message.channel.send(`\`\`\`css\n${joinedArr}\`\`\``).catch(err => {
     logger.log({
       level: 'error',
       timestamp: Date.now(),
@@ -115,4 +130,5 @@ module.exports = async (message, guildConfig, sortBy, isAsc) => {
       message: err
     });
   });
+ })
 };
