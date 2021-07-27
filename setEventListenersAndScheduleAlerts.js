@@ -25,7 +25,8 @@ const setEventListenersAndScheduleAlerts = async bot => {
     // 2a. FETCH EVENT MESSAGE
     // check if guild config exists
     if (!event.guild) return;
-    const guild = await bot.guilds.fetch(event.guild.id);
+    const guild = await bot.guilds.fetch(event.guild.id).catch(err => console.log("no access"))
+    if (!guild) return;
     const channel = await guild.channels.cache.get(event.guild.announcementsChannel);
     if (!channel) {
       const members = await guild.members.fetch()
@@ -35,20 +36,20 @@ const setEventListenersAndScheduleAlerts = async bot => {
     let eventMessage = await channel.messages.fetch(event.messageId);
 
     // 2b. IF MESSAGE DOESN'T EXIST, CREATE ONE
-    if(!eventMessage) {
+    if (!eventMessage) {
       const embed = new Discord.MessageEmbed()
-      .addField("Event:", event.type, false)
-      .setDescription(event.mandatory ? "Mandatory" : "Non-mandatory")
-      .addField("Date:", new Date(event.date).toLocaleDateString("en-GB"), true)
-      .addField("Time:", event.hour, true)
-      .addField("Details:", event.content, false)
-      .addField("Signed up:", `${event.yesMembers.length}/${totalMemberCount}`, true)
-      .addField("Can\'t:", `${event.noMembers.length}/${totalMemberCount}`, true)
-      .addField("Undecided:", `${event.undecidedMembers.length}/${totalMemberCount}`, true)
-      .setColor(event.mandatory ? "#ff0000" : "#58de49");
+        .addField("Event:", event.type, false)
+        .setDescription(event.mandatory ? "Mandatory" : "Non-mandatory")
+        .addField("Date:", new Date(event.date).toLocaleDateString("en-GB"), true)
+        .addField("Time:", event.hour, true)
+        .addField("Details:", event.content, false)
+        .addField("Signed up:", `${event.yesMembers.length}/${totalMemberCount}`, true)
+        .addField("Can\'t:", `${event.noMembers.length}/${totalMemberCount}`, true)
+        .addField("Undecided:", `${event.undecidedMembers.length}/${totalMemberCount}`, true)
+        .setColor(event.mandatory ? "#ff0000" : "#58de49");
 
-    eventMessage = await channel.send(embed);
-    await updateEventMessage(event, eventMessage)
+      eventMessage = await channel.send(embed);
+      await updateEventMessage(event, eventMessage)
     }
 
     // 3. SET LISTENER
@@ -85,7 +86,7 @@ const setEventListenersAndScheduleAlerts = async bot => {
             commandAuthor: null,
             message: err
           });
-          
+
           return user.send("There was a problem with your request. Please, try again later.");
 
         };

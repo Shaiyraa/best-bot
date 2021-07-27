@@ -14,7 +14,7 @@ module.exports = async (message, guildConfig, familyName) => {
   // 1. ASK FOR CONFIRMATION
   message.channel.send("Are you sure? Type \"yes\" to delete the profile forever!");
   const value = await confirmation(message);
-  if(!value) return message.channel.send("Bye!");
+  if (!value) return message.channel.send("Bye!");
 
   if (familyName) {
     // 2. FETCH MEMBER
@@ -41,9 +41,9 @@ module.exports = async (message, guildConfig, familyName) => {
     await deleteMemberProfileFromDB(member.id, guildConfig._id, "admin");
   } else {
     try {
-      await axios.delete(`${process.env.API_URL}/api/v1/users/discord/${message.author.id}?deletedBy=user`);
+      await axios.delete(`${process.env.API_URL}/api/v1/users/discord/${message.author.id}?guild=${guildConfig._id}&deletedBy=user`);
     } catch (err) {
-      if(err.response.status === 404) return message.channel.send("This profile doesn't exist.")
+      if (err.response.status === 404) return message.channel.send("This profile doesn't exist.")
       logger.log({
         level: 'error',
         timestamp: Date.now(),

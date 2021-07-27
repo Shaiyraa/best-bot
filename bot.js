@@ -61,6 +61,7 @@ bot.on("message", async message => {
   }
 
   let prefix = config.prefix;
+  if (process.env.NODE_ENV === "development") prefix = config.devPrefix;
 
   //Check for prefix
   if (!message.content.startsWith(prefix)) {
@@ -69,7 +70,7 @@ bot.on("message", async message => {
 
   let messageArray = message.content.split(" ");
   let cmd = messageArray[0];
-  if(!cmd.length) return
+  if (!cmd.length) return
   let args = messageArray.slice(1);
 
   let commandfile = bot.commands.get(cmd.slice(prefix.length));
