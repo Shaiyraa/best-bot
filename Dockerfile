@@ -8,6 +8,8 @@ WORKDIR /usr/src/bot
 # Install app dependencies
 COPY ./ ./
 
+RUN echo "Europe/Warsaw" > /etc/timezone
+
 # COPY package.json /usr/src/bot-api
 RUN npm install
 
