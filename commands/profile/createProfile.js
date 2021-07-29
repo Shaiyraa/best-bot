@@ -19,7 +19,7 @@ module.exports = async (message, guildConfig, params) => {
       }
     });
 
-    if(res.data.data.user) return message.channel.send("Your profile already exists. If you wanna modify it, try ?profile edit");
+    if (res.data.data.user) return message.channel.send("Your profile already exists. If you wanna modify it, try ?profile edit");
 
   } catch (err) {
     // do stuff only if response is other than not found
@@ -35,7 +35,7 @@ module.exports = async (message, guildConfig, params) => {
         message: err
       });
       return message.channel.send("There was a problem with your request. Please, try again later.");
-    } 
+    };
   };
 
   let familyName;
@@ -47,9 +47,9 @@ module.exports = async (message, guildConfig, params) => {
   let level;
 
   // 2a. CHECK IF PARAMS ARE VALID
-  if(params.length) {
+  if (params.length) {
     familyName = params[0]
-    if(!familyName.match(/^([a-zA-Z0-9][a-zA-Z_0-9]{0,25})$/g)) return message.channel.send("Invalid family name format"); 
+    if (!familyName.match(/^([a-zA-Z0-9][a-zA-Z_0-9]{0,25})$/g)) return message.channel.send("Invalid family name format");
 
     characterClass = params[1]?.toLowerCase()
     if (characterClass === "zerk" || characterClass === "zerker") characterClass = "berserker"
@@ -62,23 +62,23 @@ module.exports = async (message, guildConfig, params) => {
     if (characterClass === "valk") characterClass = "valkyrie"
     if (characterClass === "warr") characterClass = "warrior"
     if (characterClass === "cors") characterClass = "corsair"
-    
-    if(!config.classes.includes(characterClass)) return message.channel.send("Invalid class name."); 
+
+    if (!config.classes.includes(characterClass)) return message.channel.send("Invalid class name.");
 
     regularAp = params[2]
-    if(!regularAp?.match(/^([1-9][0-9]{0,2})$/g)) return message.channel.send("Invalid regular AP."); 
+    if (!regularAp?.match(/^([1-9][0-9]{0,2})$/g)) return message.channel.send("Invalid regular AP.");
 
     awakeningAp = params[3]
-    if(!awakeningAp?.match(/^([1-9][0-9]{0,2})$/g)) return message.channel.send("Invalid awakening AP."); 
+    if (!awakeningAp?.match(/^([1-9][0-9]{0,2})$/g)) return message.channel.send("Invalid awakening AP.");
 
     dp = params[4]
-    if(!dp?.match(/^([1-9][0-9]{0,2})$/g)) return message.channel.send("Invalid DP."); 
+    if (!dp?.match(/^([1-9][0-9]{0,2})$/g)) return message.channel.send("Invalid DP.");
 
     level = params[5]
-    if(!level?.match(/^([1-9][0-9]{0,1})$/g)) return message.channel.send("Invalid level."); 
+    if (!level?.match(/^([1-9][0-9]{0,1})$/g)) return message.channel.send("Invalid level.");
 
     stance = "awakening"
-    if(characterClass !== "shai") {
+    if (characterClass !== "shai") {
       message.channel.send("Do you play awakening or succession?");
       stance = await validateStance(message);
       if (stance === "exit") return message.channel.send("Bye!");
@@ -95,7 +95,7 @@ module.exports = async (message, guildConfig, params) => {
     if (characterClass === "exit") return message.channel.send("Bye!");
 
     // class easter eggs
-    if(characterClass === "musa") message.channel.send("lmao");
+    if (characterClass === "musa") message.channel.send("lmao");
 
     stance = "awakening"
     if (characterClass !== "shai") {
@@ -163,15 +163,15 @@ module.exports = async (message, guildConfig, params) => {
     });
   };
 
-  if(!resEvents.data.results) return;
+  if (!resEvents.data.results) return;
   const events = resEvents.data.data.events;
 
   events.forEach(async event => {
     const announcementsChannel = await message.guild.channels.cache.get(guildConfig.announcementsChannel);
     if (!announcementsChannel) return guild.owner.send("Announcement channel doesn't exist anymore. Update the config, if you want the bot to function correctly.");
-    
+
     const eventMessage = await announcementsChannel.messages.fetch(event.messageId);
-    
+
     // 1. make user undecided
     let resChangeGroup
     try {

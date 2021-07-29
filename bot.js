@@ -19,7 +19,6 @@ bot.on("ready", async () => {
   await setEventListenersAndScheduleAlerts(bot).catch(console.log)
 });
 
-
 // create commands
 bot.commands = new Discord.Collection();
 
@@ -58,7 +57,12 @@ bot.on("message", async message => {
   if (message.content?.toLowerCase() === "good bot") {
     message.channel.send("^^");
     return;
-  }
+  };
+
+  if (message.content?.toLowerCase() === "trash bot") {
+    message.channel.send("no u");
+    return;
+  };
 
   let prefix = config.prefix;
   if (process.env.NODE_ENV === "development") prefix = config.devPrefix;
