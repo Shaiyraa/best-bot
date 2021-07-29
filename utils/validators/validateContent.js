@@ -5,7 +5,7 @@ const validateContent = async (message) => {
   let response = "";
 
   const filter = m => m.author.id === message.author.id;
-  await message.channel.awaitMessages(filter, { max: 1, time: 30000 })
+  await message.channel.awaitMessages(filter, { max: 1, time: 120000 })
     .then(m => {
       m = m.first();
       if (!m || m.content.startsWith(config.prefix)) {

@@ -24,17 +24,17 @@ module.exports = async (bot, message, guildConfig, args) => {
   // 2a. DATE EXISTS - QUICK SETUP OF PARAMS
   if (args.length) {
     // check if date exists
-    if(args[0]) {
-      if(!args[0].match(/^(?:(?:31(\/|-|.)(?:0?[13578]|1[02]))\1|(?:(?:29|30)(\/|-|.)(?:0?[13-9]|1[0-2])\2))(?:(?:1[6-9]|[2-9]\d)?\d{2})$|^(?:29(\/|-|.)0?2\3(?:(?:(?:1[6-9]|[2-9]\d)?(?:0[48]|[2468][048]|[13579][26])|(?:(?:16|[2468][048]|[3579][26])00))))$|^(?:0?[1-9]|1\d|2[0-8])(\/|-|.)(?:(?:0?[1-9])|(?:1[0-2]))\4(?:(?:1[6-9]|[2-9]\d)?\d{2})$/g)) return message.channel.send("Wrong date format (dd/mm/yyyy).");
+    if (args[0]) {
+      if (!args[0].match(/^(?:(?:31(\/|-|.)(?:0?[13578]|1[02]))\1|(?:(?:29|30)(\/|-|.)(?:0?[13-9]|1[0-2])\2))(?:(?:1[6-9]|[2-9]\d)?\d{2})$|^(?:29(\/|-|.)0?2\3(?:(?:(?:1[6-9]|[2-9]\d)?(?:0[48]|[2468][048]|[13579][26])|(?:(?:16|[2468][048]|[3579][26])00))))$|^(?:0?[1-9]|1\d|2[0-8])(\/|-|.)(?:(?:0?[1-9])|(?:1[0-2]))\4(?:(?:1[6-9]|[2-9]\d)?\d{2})$/g)) return message.channel.send("Wrong date format (dd/mm/yyyy).");
       date = args[0]
     } else {
       let today = new Date();
-      date = today.getDate() + '.' + (today.getMonth()+1) + '.' + today.getFullYear();
+      date = today.getDate() + '.' + (today.getMonth() + 1) + '.' + today.getFullYear();
     }
-    
+
     // check if hour exists
-    if(args[1]) {
-      if(!args[1].match(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/g)) return message.channel.send("Wrong hour format (hh:mm).");
+    if (args[1]) {
+      if (!args[1].match(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/g)) return message.channel.send("Wrong hour format (hh:mm).");
       hour = args[1];
     } else {
       hour = "20:00";
@@ -43,26 +43,26 @@ module.exports = async (bot, message, guildConfig, args) => {
     // set proper date
     date = new Date(date.split(/\D/g)[2], date.split(/\D/g)[1] - 1, date.split(/\D/g)[0], hour.split(":")[0], hour.split(":")[1]);
     if (date < Date.now()) return message.channel.send("Can't create event with past date. Try again.");
-    
+
     //check if type exists
-    if(args[2]) {
-      if(!["nodewar", "siege", "guildevent"].includes(args[2])) return message.channel.send("Wrong type (options: nodewar, siege, guildevent).");
+    if (args[2]) {
+      if (!["nodewar", "siege", "guildevent"].includes(args[2])) return message.channel.send("Wrong type (options: nodewar, siege, guildevent).");
       type = args[2]
     } else {
       type = "nodewar";
     };
 
     //check if count exists
-    if(args[3]) {
-      if(!args[3].match(/^[1-9][0-9]?$|^100$/g)) return message.channel.send("Wrong max. count (1-100).");
+    if (args[3]) {
+      if (!args[3].match(/^[1-9][0-9]?$|^100$/g)) return message.channel.send("Wrong max. count (1-100).");
       count = args[3];
     } else {
       count = 100;
     };
 
     //check if alerts exists
-    if(args[4]) {
-      switch(args[4]) {
+    if (args[4]) {
+      switch (args[4]) {
         case "true": {
           alerts = true;
           break;
@@ -80,8 +80,8 @@ module.exports = async (bot, message, guildConfig, args) => {
     };
 
     //check if mandatory exists
-    if(args[5]) {
-      switch(args[5]) {
+    if (args[5]) {
+      switch (args[5]) {
         case "true": {
           mandatory = true;
           break;
@@ -139,7 +139,7 @@ module.exports = async (bot, message, guildConfig, args) => {
       :
       alerts = false
   };
-  
+
   // 3. SET MESSAGE CONTENT
   let content = guildConfig.defaultEventMessage;
   message.channel.send("Do you want to create a custom message (yes/no)?");
@@ -152,6 +152,7 @@ module.exports = async (bot, message, guildConfig, args) => {
     case "yes": {
       message.channel.send("Type in the content (max. 1024 characters allowed):");
       content = await validateContent(message);
+      if (content === "exit") return message.channel.send("Bye!");
       break;
     };
   };
@@ -167,7 +168,7 @@ module.exports = async (bot, message, guildConfig, args) => {
   if (!channel) return message.channel.send("Announcements channel doesn\'t exist. Please, update the config, if you want the bot to function properly.");
 
 
-  const reactionMessage = await channel.send(embed).catch(console.log);
+  const reactionMessage = await channel.send(`<@&${guildConfig.memberRole}>`, { embed }).catch(console.log);
 
   const messageId = reactionMessage.id;
 
@@ -193,7 +194,7 @@ module.exports = async (bot, message, guildConfig, args) => {
     });
   } catch (err) {
     reactionMessage.delete();
-    if(err?.response.status === 409) return message.channel.send("An event with this exact date is already created.");
+    if (err?.response.status === 409) return message.channel.send("An event with this exact date is already created.");
     logger.log({
       level: 'error',
       timestamp: Date.now(),
