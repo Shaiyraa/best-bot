@@ -8,9 +8,6 @@ WORKDIR /usr/src/bot
 # Install app dependencies
 COPY ./ ./
 
-RUN echo "Europe/Warsaw" > /etc/timezone
-RUN dpkg-reconfigure -f noninteractive tzdata
-
 # COPY package.json /usr/src/bot-api
 RUN npm install
 
