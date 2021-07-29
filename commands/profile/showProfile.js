@@ -60,10 +60,10 @@ module.exports = async (message, guildConfig, familyName, sudo) => {
   const member = res.data.data.users[0];
 
   // 2. DISPLAY MESSAGE
-  const embed = new Discord.MessageEmbed().setDescription(`Profile of **${member.familyName}**:`);
+  const embed = new Discord.MessageEmbed().setDescription(`Profile of **${member.familyName}** [${member.gearscore}GS]:`);
 
-  if(sudo === "full") {
-     // CHECK IF OFFICER
+  if (sudo === "full") {
+    // CHECK IF OFFICER
     const isOfficer = await hasRole(message, guildConfig.officerRole)
     if (isOfficer) member.private = false
   };
