@@ -7,7 +7,7 @@ module.exports = async (event, eventMessage) => {
   undecidedMembersList.length ? undecidedMembersList = undecidedMembersList.join(", ") : undecidedMembersList = "good job! no slackers on this event";
 
   let signupStatus = "CLOSED";
-  if ((new Date(event.date).getTime() - new Date(Date.now()).getTime()) > 1.5 * 60 * 60 * 1000 && event.maxCount > event.yesMembers.length) {
+  if ((new Date(event.date).getTime() - new Date(Date.now()).getTime()) > 1 * 60 * 60 * 1000 && event.maxCount > event.yesMembers.length) {
     signupStatus = "OPEN";
   }
 
