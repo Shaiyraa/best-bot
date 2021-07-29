@@ -46,6 +46,7 @@ module.exports = async (bot, message, guildConfig, args) => {
 
     //check if type exists
     if (args[2]) {
+      args[2] = args[2]?.toLowerCase();
       if (!["nodewar", "siege", "guildevent"].includes(args[2])) return message.channel.send("Wrong type (options: nodewar, siege, guildevent).");
       type = args[2]
     } else {
@@ -62,12 +63,15 @@ module.exports = async (bot, message, guildConfig, args) => {
 
     //check if alerts exists
     if (args[4]) {
+      args[4] = args[4]?.toLowerCase();
       switch (args[4]) {
-        case "true": {
+        case "true":
+        case "t": {
           alerts = true;
           break;
         };
-        case "false": {
+        case "false":
+        case "f": {
           alerts = false;
           break;
         };
@@ -82,11 +86,13 @@ module.exports = async (bot, message, guildConfig, args) => {
     //check if mandatory exists
     if (args[5]) {
       switch (args[5]) {
-        case "true": {
+        case "true":
+        case "t": {
           mandatory = true;
           break;
         };
-        case "false": {
+        case "false":
+        case "f": {
           mandatory = false;
           break;
         };
