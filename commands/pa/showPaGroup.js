@@ -1,7 +1,7 @@
 const Discord = require('discord.js');
 const axios = require('axios');
-const deleteGroup = require('./deleteGroup');
-const editGroup = require('./editGroup');
+const deletePaGroup = require('./deletePaGroup');
+const editPaGroup = require('./editPaGroup');
 const logger = require('../../logger');
 const config = require('../../config.json');
 
@@ -9,14 +9,14 @@ module.exports = async (message, guildConfig, groupName) => {
   if (!groupName) return message.channel.send("Provide a group name.");
 
   // 1a. SEE IF THE GROUP IS IN GUILDCONFIG
-  const groups = guildConfig.groups.filter(group => group.name === groupName.toUpperCase())
-  const group = groups[0];
-  if (!group) return message.channel.send("This group doesn't exist.");
+  const paGroups = guildConfig.paGroups.filter(group => group.name === groupName.toUpperCase())
+  const paGroup = paGroups[0];
+  if (!paGroup) return message.channel.send("This group doesn't exist.");
 
   // 2b. FETCH THE GROUP
   let res;
   try {
-    res = await axios.get(`${process.env.API_URL}/api/v1/guilds/${guildConfig._id}/groups/${group._id}`);
+    res = await axios.get(`${process.env.API_URL}/api/v1/guilds/${guildConfig._id}/pa-groups/${paGroup._id}`);
   } catch (err) {
     logger.log({
       level: 'error',
@@ -31,12 +31,12 @@ module.exports = async (message, guildConfig, groupName) => {
     if (err?.response.status === 404) return message.channel.send(err.response.data.message);
     return message.channel.send("There was a problem with your request. Please, try again later.");
   };
-  const resGroup = res.data.data.group;
+  const resGroup = res.data.data.paGroup;
 
   // 2. FETCH THE USERS IN THE GROUP
   let resUsers;
   try {
-    resUsers = await axios.get(`${process.env.API_URL}/api/v1/users?guild=${guildConfig._id}&group=${group._id}`);
+    resUsers = await axios.get(`${process.env.API_URL}/api/v1/users?guild=${guildConfig._id}&paGroup=${paGroup._id}`);
     //if(!resUsers.data.results) return message.channel.send("I didn't find any users belonging to this group.");
   } catch (err) {
     logger.log({
@@ -88,12 +88,12 @@ module.exports = async (message, guildConfig, groupName) => {
 
     switch (reaction.emoji.name) {
       case config.deleteEmoji: {
-        await deleteGroup(message, guildConfig, group.name);
+        await deletePaGroup(message, guildConfig, paGroup.name);
         break;
       };
 
       case config.editEmoji: {
-        await editGroup(message, guildConfig, group.name);
+        await editPaGroup(message, guildConfig, paGroup.name);
         break;
       };
 
@@ -101,10 +101,10 @@ module.exports = async (message, guildConfig, groupName) => {
         if (!resUsers.data.results) return message.channel.send("There are no users to display.")
 
         // get ppl in group
-        let resUsers;
+        let resUsersStats;
         try {
-          resUsers = await axios.get(`${process.env.API_URL}/api/v1/users?guild=${guildConfig._id}&group=${group._id}&sort=gearscore`);
-          if (!resUsers.data.results) return message.channel.send("No users belonging to this group found.");
+          resUsersStats = await axios.get(`${process.env.API_URL}/api/v1/users?guild=${guildConfig._id}&paGroup=${paGroup._id}&sort=gearscore`);
+          if (!resUsersStats.data.results) return message.channel.send("No users belonging to this PA group found.");
         } catch (err) {
           logger.log({
             level: 'error',
@@ -118,7 +118,7 @@ module.exports = async (message, guildConfig, groupName) => {
           });
           return message.channel.send("There was a problem with your request. Please, try again later.");
         };
-        const members = resUsers.data.data.users;
+        const members = resUsersStats.data.data.users;
 
         // count the stats
         let membersData = [`${"<FAMILY NAME>".padEnd(25, ' ')} ${"<AP>".toString().padEnd(5, ' ')} ${"<AAP>".toString().padEnd(5, ' ')} ${"<DP>".toString().padEnd(5, ' ')} ${"<GS>".toString().padEnd(5, ' ')} ${"<CLASS>".padEnd(16, ' ')} ${"<UPDATE>".padEnd(15, ' ')}\n`]

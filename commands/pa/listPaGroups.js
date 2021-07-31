@@ -1,0 +1,80 @@
+const Discord = require('discord.js');
+const axios = require('axios');
+const editPaGroup = require('./editPaGroup');
+const deletePaGroup = require('./deletePaGroup');
+const logger = require('../../logger');
+const config = require('../../config.json');
+
+module.exports = async (message, guildConfig) => {
+
+  // 1. GET ALL USERS FROM THE GUILD
+  let res;
+  try {
+    res = await axios.get(`${process.env.API_URL}/api/v1/users?guild=${guildConfig._id}`)
+  } catch (err) {
+    logger.log({
+      level: 'error',
+      timestamp: Date.now(),
+      commandAuthor: {
+        id: message.author.id,
+        username: message.author.username,
+        tag: message.author.tag
+      },
+      message: err
+    });
+    return messge.channel.send(err.response.data.message);
+  };
+  const users = res.data.data.users;
+
+  // 2. GET ALL THE PA GROUPS FOR THIS GUILD
+  const paGroups = guildConfig.paGroups;
+  if (!paGroups.length) return message.channel.send("No PA groups found.");
+
+  paGroups.forEach(async paGroup => {
+
+    // 3. GET ALL USERS FROM THE GROUP
+    let count = 0;
+    users.filter(member => {
+      if (member.paGroup?.name === paGroup.name) count++
+    });
+
+    // 4. DISPLAY EMBED WITH NAME AND NUMBER OF PPL IN THE GROUP
+    const embed = new Discord.MessageEmbed()
+      .addField("Name:", paGroup.name, false)
+      .addField("Members:", count, false)
+      .addField("Max. Size:", paGroup.maxCount, false)
+
+    const reactionMessage = await message.channel.send(embed);
+
+    // 5. CREATE LISTENER TO UPDATE AND DELETE GROUP
+    // set emojis
+    let emojis = [config.editEmoji, config.deleteEmoji];
+    await reactionMessage.react(config.editEmoji);
+    await reactionMessage.react(config.deleteEmoji);
+
+    const filter = (reaction, user) => {
+      if (!emojis.includes(reaction.emoji.name)) {
+        let reactionMap = reactionMessage.reactions.resolve(reaction.emoji.id) || reactionMessage.reactions.resolve(reaction.emoji.name);
+        reactionMap?.users.remove(user.id);
+      };
+      return (emojis.includes(reaction.emoji.name) && (user.id === message.author.id))
+    };
+
+    const collector = reactionMessage.createReactionCollector(filter, { max: 1, dispose: true });
+    collector.on('collect', async (reaction, user) => {
+
+      switch (reaction.emoji.name) {
+        case config.deleteEmoji: {
+          await deletePaGroup(message, guildConfig, paGroup.name);
+          break;
+        };
+
+        case config.editEmoji: {
+          await editPaGroup(message, guildConfig, paGroup.name);
+          break;
+        };
+      };
+    });
+  });
+};
+

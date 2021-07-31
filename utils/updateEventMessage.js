@@ -92,6 +92,25 @@ module.exports = async (event, eventMessage) => {
     noMembersList = event.noMembers.map(member => member.familyName).join(", ")
   }
 
+  // 3d. define pa rotation field
+  let paGroupsObj = {}
+  if (event.yesMembers.length) {
+    event.yesMembers.map(member => {
+      // if user has PA assigned, push him to corresponding PA group
+      if (member.paGroup) {
+        if (!paGroupsObj[member.paGroup.name]) paGroupsObj[member.paGroup.name] = [];
+        paGroupsObj[member.paGroup.name].push(member.familyName);
+      }
+    })
+  }
+
+  let paRotation = event.guild.paGroups.map(paGroup => {
+    return `${paGroup.name.padEnd(10, " ")}: ${paGroupsObj[paGroup.name]?.length ? paGroupsObj[paGroup.name] : "empty"}\n`
+  })
+
+  groupFields.push({ name: "PA ROTATION", value: `\`\`\`fix\n${paRotation.join("")}\`\`\`` });
+
+  // 3e. push other fields
   groupFields.push({ name: "CAN\'T", value: noMembersList });
 
   groupFields.push({ name: "UNDECIDED", value: undecidedMembersList });
