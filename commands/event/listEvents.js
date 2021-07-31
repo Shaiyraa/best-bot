@@ -10,9 +10,7 @@ module.exports = async (message, guildConfig) => {
   // 1. GET ALL THE EVENTS FOR THIS GUILD
   let res;
   try {
-    res = await axios.get(`${process.env.API_URL}/api/v1/events?date[gte]=${Date.now()}`, {
-      guild: guildConfig._id
-    });
+    res = await axios.get(`${process.env.API_URL}/api/v1/events?date[gte]=${Date.now()}&guild=${guildConfig._id}`);
   } catch (err) {
     logger.log({
       level: 'error',

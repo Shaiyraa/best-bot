@@ -105,10 +105,16 @@ module.exports = async (event, eventMessage) => {
   }
 
   let paRotation = event.guild.paGroups.map(paGroup => {
-    return `${paGroup.name.padEnd(10, " ")}: ${paGroupsObj[paGroup.name]?.length ? paGroupsObj[paGroup.name] : "empty"}\n`
+    return `${paGroup.name.padEnd(10, " ")}: ${paGroupsObj[paGroup.name]?.length ? paGroupsObj[paGroup.name].join(", ") : "empty"}\n`
   })
 
-  groupFields.push({ name: "PA ROTATION", value: `\`\`\`fix\n${paRotation.join("")}\`\`\`` });
+  if (!paRotation.length) {
+    paRotation = "empty";
+  } else {
+    paRotation = paRotation.join("");
+  };
+
+  groupFields.push({ name: "PA ROTATION", value: `\`\`\`fix\n${paRotation}\`\`\`` });
 
   // 3e. push other fields
   groupFields.push({ name: "CAN\'T", value: noMembersList });

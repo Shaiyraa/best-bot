@@ -65,7 +65,8 @@ module.exports.run = async (bot, message, args) => {
         "• ?pa delete [pa group name] - to delete a PA group",
         "\n**other**",
         "• ?pa assign [pa group name] [familyName] - to assign PA group to one guild members",
-        "• ?pa assign [pa group name] - to assign PA group to many guild members"
+        "• ?pa assign [pa group name] - to assign PA group to many guild members",
+        "• ?pa remove [member family name] - to remove PA group from guild member"
       ];
 
       // 1. SEND MESSAGE
@@ -104,7 +105,8 @@ module.exports.run = async (bot, message, args) => {
           "• ?pa delete [pa group name] - to delete PA group",
           "\n**other**",
           "• ?pa assign [pa group name] [familyName] - to assign PA group to one guild members",
-          "• ?pa assign [pa group name] - to assign PA group to many guild members"
+          "• ?pa assign [pa group name] - to assign PA group to many guild members",
+          "• ?pa remove [member family name] - to remove PA group from guild member"
         ]
 
         const advancedEmbed = new Discord.MessageEmbed()

@@ -8,8 +8,8 @@ const validateResponseRegex = require("../../utils/validators/validateResponseRe
 module.exports = async (message, guildConfig, event) => {
 
   // ask for param
-  message.channel.send('What do you want to update (type, mandatory, alerts, description)?');
-  let param = await validateResponse(message, "Invalid response (options: type, mandatory, alerts, description)", ["type", "mandatory", "alerts", "description"]);
+  message.channel.send('What do you want to update (type, attendance, mandatory, alerts, description)?');
+  let param = await validateResponse(message, "Invalid response (options: type, attendance, mandatory, alerts, description)", ["type", "attendance", "mandatory", "alerts", "description"]);
   if (param === "exit") return message.channel.send("Bye!");
 
   // ask for value
@@ -19,6 +19,36 @@ module.exports = async (message, guildConfig, event) => {
       message.channel.send(`What is the type of the event? Current type: ${event.type}. Possible types: "nodewar", "siege", "guildevent"`);
       value = await validateResponse(message, "Invalid response (nodewar, siege, guildevent)", ["nodewar", "siege", "guildevent"]);
       if (value === "exit") return message.channel.send("Bye!");
+
+      break;
+    };
+    case "attendance": {
+      message.channel.send('What is the max amount of people (1-100)?');
+      value = await validateResponseRegex(message, "Invalid number.", /^[1-9][0-9]?$|^100$/g);
+      if (value === "exit") return message.channel.send("Bye!");
+
+      // 1. check how many yesMembers there is
+      let resMembers;
+      try {
+        resMembers = await axios.get(`${process.env.API_URL}/api/v1/events/${event._id}`);
+      } catch {
+        logger.log({
+          level: 'error',
+          timestamp: Date.now(),
+          commandAuthor: {
+            id: message.author.id,
+            username: message.author.username,
+            tag: message.author.tag
+          },
+          message: err
+        });
+        return message.channel.send("There was a problem with your request. Please, try again later.");
+      }
+
+      // 2. compare value with yesArray to see if cap is possible
+      const yesMembers = resMembers.data.data.event.yesMembers;
+      if (value < yesMembers.length) return message.channel.send(`You can\`t set a cap smaller than current signups count (${yesMembers.length})!`);
+      param = "maxCount";
 
       break;
     };
@@ -50,7 +80,7 @@ module.exports = async (message, guildConfig, event) => {
         };
       };
 
-      param = "content"
+      param = "content";
       break;
     };
   }
