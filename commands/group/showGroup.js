@@ -101,10 +101,10 @@ module.exports = async (message, guildConfig, groupName) => {
         if (!resUsers.data.results) return message.channel.send("There are no users to display.")
 
         // get ppl in group
-        let resUsers;
+        let resUsersStats;
         try {
-          resUsers = await axios.get(`${process.env.API_URL}/api/v1/users?guild=${guildConfig._id}&group=${group._id}&sort=gearscore`);
-          if (!resUsers.data.results) return message.channel.send("No users belonging to this group found.");
+          resUsersStats = await axios.get(`${process.env.API_URL}/api/v1/users?guild=${guildConfig._id}&group=${group._id}&sort=gearscore`);
+          if (!resUsersStats.data.results) return message.channel.send("No users belonging to this group found.");
         } catch (err) {
           logger.log({
             level: 'error',
@@ -118,7 +118,7 @@ module.exports = async (message, guildConfig, groupName) => {
           });
           return message.channel.send("There was a problem with your request. Please, try again later.");
         };
-        const members = resUsers.data.data.users;
+        const members = resUsersStats.data.data.users;
 
         // count the stats
         let membersData = [`${"<FAMILY NAME>".padEnd(25, ' ')} ${"<AP>".toString().padEnd(5, ' ')} ${"<AAP>".toString().padEnd(5, ' ')} ${"<DP>".toString().padEnd(5, ' ')} ${"<GS>".toString().padEnd(5, ' ')} ${"<CLASS>".padEnd(16, ' ')} ${"<UPDATE>".padEnd(15, ' ')}\n`]
