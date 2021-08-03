@@ -1,6 +1,7 @@
 const Discord = require('discord.js');
 const createProfile = require("./createProfile");
 const showProfile = require("./showProfile");
+const showHistory = require("./showHistory");
 const listProfiles = require("./listProfiles");
 const editProfile = require("./editProfile");
 const togglePrivate = require("./togglePrivate");
@@ -29,7 +30,15 @@ module.exports.run = async (bot, message, args) => {
       break;
     };
     case "show": {
-      showProfile(message, guildConfig, args[1], args[2]);
+      const familyName = args[1];
+      const sudo = args[2];
+      showProfile(message, guildConfig, familyName, sudo);
+      break;
+    };
+    case "history": {
+      const familyName = args[1];
+      const sudo = args[2];
+      showHistory(message, guildConfig, familyName, sudo);
       break;
     };
     case "list": {
@@ -39,7 +48,9 @@ module.exports.run = async (bot, message, args) => {
       break;
     };
     case "edit": {
-      editProfile(message, guildConfig, args[1], args[2]);
+      const param = args[1];
+      const value = args[2];
+      editProfile(message, guildConfig, param, value);
       break;
     };
     case "private": {
@@ -47,7 +58,8 @@ module.exports.run = async (bot, message, args) => {
       break;
     };
     case "delete": {
-      deleteProfile(message, guildConfig, args[1]);
+      const familyName = args[1]
+      deleteProfile(message, guildConfig, familyName);
       break;
     };
     default: {
@@ -58,6 +70,7 @@ module.exports.run = async (bot, message, args) => {
         "\n**display**",
         "• `?profile show` - to show your own profile",
         "• `?profile show [family name]` - to show member's profile",
+        "• `?profile history [family name]` - to show member's update history",
         "• `?profile list` - to display all profiles ordered by gearscore",
 
         "\n**modify**",
@@ -70,10 +83,11 @@ module.exports.run = async (bot, message, args) => {
         "\n**BOT MASTER ZONE**",
         "**display**",
         "• `?profile show [family name] full` - to show full member's profile, even though it's set to private - bot masters only (everyone who has access to the channel, will see it, so use it cautiously!)", // TODO: config for bot masters only channel and restrict the command to it
+        "• `?profile history [family name] full` - to show member's update history even though it's set to private - bot masters only (everyone who has access to the channel, will see it, so use it cautiously!)",
 
         "\n**delete**",
         "• `?profile delete [familyName]` - to delete members profiles (bot masters only)",
-       
+
         "\nwords in [] are command params, it means you have to replace them with your own - without brackets, for example: ?profile private false"
       ];
 
@@ -96,7 +110,7 @@ module.exports.run = async (bot, message, args) => {
         };
         return reaction.emoji.name === config.advancedUserEmoji
       };
-    
+
       const collector = helpMessage.createReactionCollector(filter, { max: 1, dispose: true });
       collector.on('collect', async (reaction, user) => {
 
@@ -108,6 +122,7 @@ module.exports.run = async (bot, message, args) => {
           "\n**display**",
           "• `?profile show` - to show your own profile",
           "• `?profile show [family name]` - to show member's profile",
+          "• `?profile history [family name]` - to show member's update history",
           "• `?profile list` - to display all profiles ordered by gearscore",
           "• `?profile list [sortBy]` - to display all profiles ordered by param (ap, aap, dp, gearscore, class, update)",
           "• `?profile list [sortBy] [asc/desc]` - to specify also the sort method; asc/a = ascending, desc/d = descending",
@@ -123,15 +138,16 @@ module.exports.run = async (bot, message, args) => {
           "\n**BOT MASTER ZONE**",
           "**display**",
           "• `?profile show [family name] full` - to show full member's profile, even though it's set to private - bot masters only (everyone who has access to the channel, will see it, so use it cautiously!)", // TODO: config for bot masters only channel and restrict the command to it
+          "• `?profile history [family name] full` - to show member's update history even though it's set to private - bot masters only (everyone who has access to the channel, will see it, so use it cautiously!)",
 
           "\n**delete**",
           "• `?profile delete [familyName]` - to delete members profiles (bot masters only)",
         ]
 
         const advancedEmbed = new Discord.MessageEmbed()
-        .setTitle("Advanced Options")
-        .setDescription(advancedOptions);
-        
+          .setTitle("Advanced Options")
+          .setDescription(advancedOptions);
+
         // 4. EDIT MESSAGE WITH ADVANCED STUFF
         helpMessage.edit(advancedEmbed);
         helpMessage.reactions.removeAll();

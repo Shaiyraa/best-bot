@@ -6,7 +6,8 @@ const hasRole = require('../../utils/hasRole');
 
 module.exports = async (message, guildConfig, familyName, sudo) => {
 
-  // if family doesn't exist, request user object by discord id first
+  // 1. FIND USER
+  let member
   if (!familyName) {
     let res;
     try {
@@ -32,32 +33,31 @@ module.exports = async (message, guildConfig, familyName, sudo) => {
       return message.channel.send("There was a problem with your request. Please, try again later.");
     };
 
-    familyName = res.data.data.user.familyName;
-  }
+    member = res.data.data.user;
+  } else {
+    let res;
+    try {
+      res = await axios({
+        method: 'GET',
+        url: `${process.env.API_URL}/api/v1/users?familyName=${familyName}&guild=${guildConfig._id}`
+      });
+    } catch (err) {
+      logger.log({
+        level: 'error',
+        timestamp: Date.now(),
+        commandAuthor: {
+          id: message.author.id,
+          username: message.author.username,
+          tag: message.author.tag
+        },
+        message: err
+      });
+      return message.channel.send("There was a problem with your request. Please, try again later.");
+    }
 
-  // 1. FIND USER
-  let res;
-  try {
-    res = await axios({
-      method: 'GET',
-      url: `${process.env.API_URL}/api/v1/users?familyName=${familyName}&guild=${guildConfig._id}`
-    });
-  } catch (err) {
-    logger.log({
-      level: 'error',
-      timestamp: Date.now(),
-      commandAuthor: {
-        id: message.author.id,
-        username: message.author.username,
-        tag: message.author.tag
-      },
-      message: err
-    });
-    return message.channel.send("There was a problem with your request. Please, try again later.");
+    if (!res.data.results) return message.channel.send("This profile doesn't exist.");
+    member = res.data.data.users[0];
   }
-
-  if (!res.data.results) return message.channel.send("This profile doesn't exist.");
-  const member = res.data.data.users[0];
 
   // 2. DISPLAY MESSAGE
   const embed = new Discord.MessageEmbed().setDescription(`Profile of **${member.familyName}** [${member.gearscore}GS]:`);
