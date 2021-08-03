@@ -12,11 +12,11 @@ module.exports.run = async (bot, message, args) => {
   const guildConfig = await isGuildInDB(message);
   if (!guildConfig) return;
 
- // 2. CHECK IF OFFICER
- const isOfficer = await hasRole(message, guildConfig.officerRole)
- if (!isOfficer) return message.channel.send(`Only <@&${guildConfig.officerRole}> can use this command.`, { "allowedMentions": { "users": [] } });
- 
-  
+  // 2. CHECK IF OFFICER
+  const isOfficer = await hasRole(message, guildConfig.officerRole)
+  if (!isOfficer) return message.channel.send(`Only <@&${guildConfig.officerRole}> can use this command.`, { "allowedMentions": { "users": [] } });
+
+
   switch (args[0]) {
     case "basic": {
       const group = args[1]
@@ -55,7 +55,7 @@ module.exports.run = async (bot, message, args) => {
         };
         return reaction.emoji.name === config.advancedUserEmoji
       };
-    
+
       const collector = helpMessage.createReactionCollector(filter, { max: 1, dispose: true });
       collector.on('collect', async (reaction, user) => {
 
@@ -67,9 +67,9 @@ module.exports.run = async (bot, message, args) => {
         ]
 
         const advancedEmbed = new Discord.MessageEmbed()
-        .setTitle("Advanced Options")
-        .setDescription(advancedOptions);
-        
+          .setTitle("Advanced Options")
+          .setDescription(advancedOptions);
+
         // 4. EDIT MESSAGE WITH ADVANCED STUFF
         helpMessage.edit(advancedEmbed);
         helpMessage.reactions.removeAll();
