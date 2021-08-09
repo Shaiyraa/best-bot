@@ -101,11 +101,11 @@ module.exports = async (message, guildConfig, sortBy, isAsc) => {
       membersData.push(`${user.familyName.padEnd(25, ' ')} ${user.regularAp.toString().padEnd(5, ' ')} ${user.awakeningAp.toString().padEnd(5, ' ')} ${user.dp.toString().padEnd(5, ' ')} ${user.gearscore.toString().padEnd(5, ' ')} ${user.characterClass.padEnd(16, ' ')} ${date.padEnd(10, ' ')}\n`);
     }
   })
-  let array1 = membersData.slice(0, 19);
-  let array2 = membersData.slice(20, 39);
-  let array3 = membersData.slice(40, 59);
-  let array4 = membersData.slice(60, 79);
-  let array5 = membersData.slice(80, 99);
+  let array1 = membersData.slice(0, 20);
+  let array2 = membersData.slice(20, 40);
+  let array3 = membersData.slice(40, 60);
+  let array4 = membersData.slice(60, 80);
+  let array5 = membersData.slice(80, 100);
 
   let arrayOfArrays = [];
   arrayOfArrays.push(array1);
