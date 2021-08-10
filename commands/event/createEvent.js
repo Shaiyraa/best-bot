@@ -214,7 +214,7 @@ module.exports = async (bot, message, guildConfig, args) => {
     return message.channel.send("There was a problem with your request. Please, try again later.");
   };
 
-  const { event, alert } = res.data.data;
+  const { event } = res.data.data;
 
   // 7. UPDATE MESSAGE WITH REAL DATA
   await updateEventMessage(event, reactionMessage);
@@ -272,8 +272,8 @@ module.exports = async (bot, message, guildConfig, args) => {
 
   });
 
-  // 9. SCHEDULE A JOBS FOR ALERT
-  await scheduleAlertsForEvent(bot, guildConfig, event, [alert])
+  // 9. SCHEDULE JOBS FOR ALERT
+  await scheduleAlertsForEvent(bot, guildConfig, event, res.data.data.alerts)
 
   // 10. INFORM THAT EVENT WAS CREATED
   const eventCreatedEmbed = new Discord.MessageEmbed()
