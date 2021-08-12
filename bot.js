@@ -74,10 +74,11 @@ bot.on("message", async message => {
 
   let messageArray = message.content.split(" ");
   let cmd = messageArray[0];
-  if (!cmd.length) return
-  let args = messageArray.slice(1);
 
-  let commandfile = bot.commands.get(cmd.slice(prefix.length));
+  let args = messageArray.slice(1);
+  let commandName = cmd.slice(prefix.length)
+  if (!commandName.length) return;
+  let commandfile = bot.commands.get(commandName);
   if (commandfile) {
     await commandfile.run(bot, message, args);
   } else {
