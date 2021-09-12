@@ -14,3 +14,6 @@ Leaders can see stats regarding the amount of each character class in the guild,
 
 # Event creation
 There are three types of events to choose from at the moment: "nodewar", "siege", and "guildevent". Officers can choose the date and hour of future event, as well as max. number of people who can attend - if more want to sign up, they will be notified that signups are full. Bot also allows for choosing if the event is mandatory, which is a preparation for future feature of counting attendance on mandatory events. 
+
+### Backend of the project
+Best Bot API: [https://github.com/Shaiyraa/best-bot-api](https://github.com/Shaiyraa/best-bot-api)
