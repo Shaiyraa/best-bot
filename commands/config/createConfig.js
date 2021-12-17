@@ -44,9 +44,9 @@ module.exports = async (message) => {
   let officerRoleTag = await validateRole(message);
   if (officerRoleTag === "exit") return message.channel.send("Bye!");
 
-  message.channel.send("Tag the channel where you want your event announcements to pop up:");
-  let announcementsChannelTag = await validateChannel(message, "Invalid channel");
-  if (announcementsChannelTag === "exit") return message.channel.send("Bye!");
+  // message.channel.send("Tag the channel where you want your event announcements to pop up:");
+  // let announcementsChannelTag = await validateChannel(message, "Invalid channel");
+  // if (announcementsChannelTag === "exit") return message.channel.send("Bye!");
 
   message.channel.send("Tag the channel where you want to see reminders for events:");
   let remindersChannelTag = await validateChannel(message, "Invalid channel");
@@ -61,7 +61,7 @@ module.exports = async (message) => {
         id: message.channel.guild.id,
         memberRole: memberRoleTag,
         officerRole: officerRoleTag,
-        announcementsChannel: announcementsChannelTag,
+        // announcementsChannel: announcementsChannelTag,
         remindersChannel: remindersChannelTag
       }
     });
@@ -76,7 +76,7 @@ module.exports = async (message) => {
       },
       message: err
     });
-    
+
     return message.channel.send("There was a problem with your request. Please, try again later.");
   };
 

@@ -86,7 +86,6 @@ module.exports = async (message, guildConfig, event) => {
   }
 
   // 2. CALL API
-
   let res;
   try {
     res = await axios.patch(`${process.env.API_URL}/api/v1/events/${event._id}?${param}=${value}`);
@@ -105,10 +104,16 @@ module.exports = async (message, guildConfig, event) => {
   };
 
   // 3. UPDATE MESSAGE
-  const channel = await message.guild.channels.resolve(guildConfig.announcementsChannel)
-  if (!channel) return message.channel.send("Announcements channel doesn't exist. Please, update the config, if you want the bot to function properly.");
-  let eventMessage = await channel.messages.fetch(event.messageId);
-  if (!eventMessage) return message.channel.send("There was a problem with your request, as event message no longer exists.");
+  const channel = await message.guild.channels.resolve(event.messageChannelId)
+  if (!channel) return message.channel.send("You cannot modify this event's details.");
+  //if (!channel) return message.channel.send("Announcements channel doesn't exist. Please, update the config, if you want the bot to function properly.");
+
+  let eventMessage
+  try {
+    eventMessage = await channel.messages.fetch(event.messageId);
+  } catch (err) {
+    return message.channel.send("There was a problem with your request, as event message no longer exists.");
+  }
 
   await updateEventMessage(res.data.data.event, eventMessage);
   message.channel.send("Event updated successfully!");

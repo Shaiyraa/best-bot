@@ -7,7 +7,7 @@ module.exports = async (message, guildConfig, event) => {
   // 1. ASK FOR CONFIRMATION
   message.channel.send("Are you sure? Type \"yes\" to delete the event forever!");
   const value = await confirmation(message);
-  if(!value) return message.channel.send("Bye!");
+  if (!value) return message.channel.send("Bye!");
 
   // 2. CALL API TO DELETE THE EVENT
   try {
@@ -27,10 +27,16 @@ module.exports = async (message, guildConfig, event) => {
   }
 
   // 3. DELETE THE EVENT MESSAGE
-  const channel = await message.guild.channels.resolve(guildConfig.announcementsChannel)
-  if (!channel) return message.channel.send("Event has been deleted, but announcements channel doesn't exist. Please, update the config, so the bot can function properly.");
-  let eventMessage = await channel.messages.fetch(event.messageId);
-  if (eventMessage) eventMessage.delete();
-  message.channel.send("Event has been deleted.");
+  const channel = await message.guild.channels.resolve(event.messageChannelId)
+  if (!channel) return message.channel.send("Channel not found. Please, delete the event message manually.");
+  //return message.channel.send("Event has been deleted, but announcements channel doesn't exist. Please, update the config, so the bot can function properly.");
 
+  let eventMessage
+  try {
+    eventMessage = await channel.messages.fetch(event.messageId);
+    eventMessage.delete();
+    message.channel.send("Event has been deleted.");
+  } catch (err) {
+    return message.channel.send("There was a problem with your request, as event message no longer exists.");
+  }
 };

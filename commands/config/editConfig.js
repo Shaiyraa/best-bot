@@ -16,8 +16,8 @@ module.exports = async (message, param) => {
 
   if (!param) {
     // 2. ASK WHAT TO UPDATE
-    message.channel.send('What do you want to update (memberRole, botmasterRole, announcementsChannel, remindersChannel, defaultEventMessage)?');
-    param = await validateResponse(message, "Invalid response (memberRole, botmasterRole, announcementsChannel, remindersChannel, defaultEventMessage)", ["memberRole", "officerRole", "announcementsChannel", "remindersChannel", "defaultEventMessage"]);
+    message.channel.send('What do you want to update (memberRole, botmasterRole, remindersChannel, defaultEventMessage)?');
+    param = await validateResponse(message, "Invalid response (memberRole, botmasterRole, remindersChannel, defaultEventMessage)", ["memberRole", "officerRole", "announcementsChannel", "remindersChannel", "defaultEventMessage"]);
     if (param === "exit") return message.channel.send("Bye!");
   }
 
@@ -39,13 +39,13 @@ module.exports = async (message, param) => {
 
       break;
     };
-    case "announcementsChannel": {
-      message.channel.send("Tag the channel where you want your event announcements to pop up:");
-      value = await validateChannel(message);
-      if (value === "exit") return message.channel.send("Bye!");
+    // case "announcementsChannel": {
+    //   message.channel.send("Tag the channel where you want your event announcements to pop up:");
+    //   value = await validateChannel(message);
+    //   if (value === "exit") return message.channel.send("Bye!");
 
-      break;
-    };
+    //   break;
+    // };
     case "remindersChannel": {
       message.channel.send("Tag the channel where you want to see reminders for events:");
       value = await validateChannel(message);

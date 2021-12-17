@@ -9,6 +9,7 @@ const scheduleAlertsForEvent = require('../../utils/scheduleAlertsForEvent');
 const validateContent = require('../../utils/validators/validateContent');
 const validateResponseRegex = require('../../utils/validators/validateResponseRegex');
 const validateResponse = require('../../utils/validators/validateResponse');
+const validateChannel = require('../../utils/validators/validateChannel');
 
 module.exports = async (bot, message, guildConfig, args) => {
 
@@ -18,7 +19,7 @@ module.exports = async (bot, message, guildConfig, args) => {
   let count;
   let alerts;
   let mandatory;
-
+  let channelId;
   // ?event create 23.09.2022 20:00 nodewar 30
 
   // 2a. DATE EXISTS - QUICK SETUP OF PARAMS
@@ -146,6 +147,11 @@ module.exports = async (bot, message, guildConfig, args) => {
       alerts = false
   };
 
+  // ask for channel
+  message.channel.send("Tag the channel where you want the announcement to be sent:");
+  channelId = await validateChannel(message, "Invalid channel. Tag the channel where you want the announcement to be sent:");
+  if (channelId === "exit") return message.channel.send("Bye!");
+
   // 3. SET MESSAGE CONTENT
   let content = guildConfig.defaultEventMessage;
   message.channel.send("Do you want to create a custom message (yes/no)?");
@@ -170,10 +176,7 @@ module.exports = async (bot, message, guildConfig, args) => {
 
 
   // 5. CREATE ICONS
-  const channel = await message.guild.channels.resolve(guildConfig.announcementsChannel);
-  if (!channel) return message.channel.send("Announcements channel doesn\'t exist. Please, update the config, if you want the bot to function properly.");
-
-
+  const channel = await message.guild.channels.cache.get(channelId);
   const reactionMessage = await channel.send(`<@&${guildConfig.memberRole}>`, { embed }).catch(console.log);
 
   const messageId = reactionMessage.id;
@@ -196,7 +199,8 @@ module.exports = async (bot, message, guildConfig, args) => {
       alerts,
       content,
       guild: guildConfig._id,
-      messageId
+      messageId,
+      messageChannelId: channelId
     });
   } catch (err) {
     reactionMessage.delete();

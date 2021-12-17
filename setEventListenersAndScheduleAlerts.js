@@ -1,3 +1,4 @@
+const Discord = require("discord.js")
 const axios = require('axios');
 const logger = require('./logger');
 const config = require('./config.json');
@@ -27,30 +28,56 @@ const setEventListenersAndScheduleAlerts = async bot => {
     if (!event.guild) return;
     const guild = await bot.guilds.fetch(event.guild.id).catch(err => console.log("no access"))
     if (!guild) return;
-    const channel = await guild.channels.cache.get(event.guild.announcementsChannel);
+    const channel = await guild.channels.cache.get(event.messageChannelId);
     if (!channel) {
-      const members = await guild.members.fetch()
-      const owner = await guild.members.cache.get(guild.ownerID)
-      return owner.send("Announcement channel doesn't exist anymore. Update the config, if you want the bot to function correctly.");
+      // const members = await guild.members.fetch()
+      // const owner = await guild.members.cache.get(guild.ownerID)
+      // return owner.send("Announcement channel doesn't exist anymore. Update the config, if you want the bot to function correctly.");
+      return console.log("Announcement channel invalid. Returning.")
     }
-    let eventMessage = await channel.messages.fetch(event.messageId);
+    let eventMessage;
+    try {
+      eventMessage = await channel.messages.fetch(event.messageId);
+    } catch (err) {
+      // 2b. IF MESSAGE DOESN'T EXIST, CREATE ONE
+      const totalMemberCount = event.undecidedMembers.length + event.yesMembers.length + event.noMembers.length;
 
-    // 2b. IF MESSAGE DOESN'T EXIST, CREATE ONE
-    if (!eventMessage) {
       const embed = new Discord.MessageEmbed()
-        .addField("Event:", event.type, false)
-        .setDescription(event.mandatory ? "Mandatory" : "Non-mandatory")
-        .addField("Date:", new Date(event.date).toLocaleDateString("en-GB"), true)
-        .addField("Time:", event.hour, true)
-        .addField("Details:", event.content, false)
-        .addField("Signed up:", `${event.yesMembers.length}/${totalMemberCount}`, true)
-        .addField("Can\'t:", `${event.noMembers.length}/${totalMemberCount}`, true)
-        .addField("Undecided:", `${event.undecidedMembers.length}/${totalMemberCount}`, true)
-        .setColor(event.mandatory ? "#ff0000" : "#58de49");
+        .setDescription("Loading...")
+        .setFooter("Signups CLOSED");
+      // .addField("Event:", event.type, false)
+      // .setDescription(event.mandatory ? "Mandatory" : "Non-mandatory")
+      // .addField("Date:", new Date(event.date).toLocaleDateString("en-GB"), true)
+      // .addField("Time:", event.hour, true)
+      // .addField("Details:", event.content, false)
+      // .addField("Signed up:", `${event.yesMembers.length}/${totalMemberCount}`, true)
+      // .addField("Can\'t:", `${event.noMembers.length}/${totalMemberCount}`, true)
+      // .addField("Undecided:", `${event.undecidedMembers.length}/${totalMemberCount}`, true)
+      // .setColor(event.mandatory ? "#ff0000" : "#58de49");
 
       eventMessage = await channel.send(embed);
       await updateEventMessage(event, eventMessage)
+
+      // update messageId
+      try {
+        await axios.patch(`${process.env.API_URL}/api/v1/events/${event._id}/messageId?messageId=${eventMessage.id}`);
+      } catch (err) {
+        logger.log({
+          level: 'error',
+          timestamp: Date.now(),
+          commandAuthor: {
+            id: message.author.id,
+            username: message.author.username,
+            tag: message.author.tag
+          },
+          message: err
+        });
+        return message.channel.send("There was a problem with your request. Please, try again later.");
+      };
     }
+
+    await eventMessage.react(config.yesEmoji)
+    await eventMessage.react(config.noEmoji)
 
     // 3. SET LISTENER
     const filter = (reaction, user) => {

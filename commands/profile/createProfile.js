@@ -167,10 +167,15 @@ module.exports = async (message, guildConfig, params) => {
   const events = resEvents.data.data.events;
 
   events.forEach(async event => {
-    const announcementsChannel = await message.guild.channels.cache.get(guildConfig.announcementsChannel);
-    if (!announcementsChannel) return guild.owner.send("Announcement channel doesn't exist anymore. Update the config, if you want the bot to function correctly.");
+    const channel = await message.guild.channels.cache.get(event.messageChannelId);
+    if (!channel) return // guild.owner.send("Announcement channel doesn't exist anymore. Update the config, if you want the bot to function correctly.");
 
-    const eventMessage = await announcementsChannel.messages.fetch(event.messageId);
+    let eventMessage;
+    try {
+      eventMessage = await channel.messages.fetch(event.messageId);
+    } catch (err) {
+      return
+    }
 
     // 1. make user undecided
     let resChangeGroup

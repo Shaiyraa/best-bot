@@ -56,10 +56,10 @@ module.exports = async (bot, guildConfig, event, alerts) => {
           const remindersChannel = await guild.channels.cache.get(resEvent.guild.remindersChannel);
           if (!remindersChannel) return guild.owner.send("Reminders channel doesn't exist anymore. Update the config, if you want the bot to function correctly.");
 
-          const announcementsChannel = await guild.channels.cache.get(resEvent.guild.announcementsChannel);
-          if (!announcementsChannel) return guild.owner.send("Announcement channel doesn't exist anymore. Update the config, if you want the bot to function correctly.");
+          const channel = await guild.channels.cache.get(resEvent.messageChannelId);
+          if (!channel) return guild.owner.send("Announcement channel doesn't exist anymore. Update the config, if you want the bot to function correctly.");
 
-          const eventMessage = await announcementsChannel.messages.fetch(resEvent.messageId);
+          const eventMessage = await channel.messages.fetch(resEvent.messageId);
 
           await sendEmbedMessage(remindersChannel, "There's an event today! Sign up or Alish will slap you!", `[Link to the event](${eventMessage.url})`, arrayOfUndecidedTags);
 
