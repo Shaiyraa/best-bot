@@ -17,7 +17,7 @@ module.exports = async (message, param) => {
   if (!param) {
     // 2. ASK WHAT TO UPDATE
     message.channel.send('What do you want to update (memberRole, botmasterRole, remindersChannel, defaultEventMessage)?');
-    param = await validateResponse(message, "Invalid response (memberRole, botmasterRole, remindersChannel, defaultEventMessage)", ["memberRole", "officerRole", "announcementsChannel", "remindersChannel", "defaultEventMessage"]);
+    param = await validateResponse(message, "Invalid response (memberRole, botmasterRole, remindersChannel, defaultEventMessage)", ["memberRole", "botmasterRole", "announcementsChannel", "remindersChannel", "defaultEventMessage"]);
     if (param === "exit") return message.channel.send("Bye!");
   }
 
