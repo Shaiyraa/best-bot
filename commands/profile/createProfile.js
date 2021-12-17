@@ -95,7 +95,7 @@ module.exports = async (message, guildConfig, params) => {
     if (characterClass === "exit") return message.channel.send("Bye!");
 
     // class easter eggs
-    if (characterClass === "musa") message.channel.send("lmao");
+    if (characterClass === "musa") await message.channel.send("lmao");
 
     stance = "awakening"
     if (characterClass !== "shai") {

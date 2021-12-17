@@ -116,6 +116,10 @@ module.exports = async (message, guildConfig, event) => {
   }
 
   await updateEventMessage(res.data.data.event, eventMessage);
-  message.channel.send("Event updated successfully!");
+  if (param === "description") {
+    message.channel.send(`Event description updated successfully!`);
+  } else {
+    message.channel.send(`Event updated successfully! Updated ${param} to new value: ${value}.`);
+  }
 };
 
