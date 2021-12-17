@@ -32,7 +32,7 @@ module.exports = async (message, param) => {
       await fetchAllMembersAndDeleteTheirProfiles(guildConfig._id)
       break;
     };
-    case "officerRole": {
+    case "botmasterRole": {
       message.channel.send("Tag the bot master role:");
       value = await validateRole(message);
       if (value === "exit") return message.channel.send("Bye!");
