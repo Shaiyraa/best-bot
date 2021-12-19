@@ -106,6 +106,9 @@ module.exports = async (message, guildConfig, sortBy, isAsc) => {
   let array3 = membersData.slice(40, 60);
   let array4 = membersData.slice(60, 80);
   let array5 = membersData.slice(80, 100);
+  let array6 = membersData.slice(100, 120);
+  let array7 = membersData.slice(120, 140);
+  let array8 = membersData.slice(140, 150);
 
   let arrayOfArrays = [];
   arrayOfArrays.push(array1);
@@ -113,11 +116,15 @@ module.exports = async (message, guildConfig, sortBy, isAsc) => {
   array3.length ? arrayOfArrays.push(array3) : "";
   array4.length ? arrayOfArrays.push(array4) : "";
   array5.length ? arrayOfArrays.push(array5) : "";
+  array6.length ? arrayOfArrays.push(array6) : "";
+  array7.length ? arrayOfArrays.push(array7) : "";
+  array8.length ? arrayOfArrays.push(array8) : "";
+
   // const formattedMembersData = membersData.join('');
 
   arrayOfArrays.forEach(arr => {
     let joinedArr = arr.join(" ")
-    message.channel.send(`\`\`\`css\n${joinedArr}\`\`\``).catch(err => {
+    message.channel.send(`\`\`\`css\n ${joinedArr}\`\`\``).catch(err => {
       logger.log({
         level: 'error',
         timestamp: Date.now(),
