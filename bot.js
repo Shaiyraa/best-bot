@@ -77,7 +77,7 @@ bot.on("message", async message => {
 
   let args = messageArray.slice(1);
   let commandName = cmd.slice(prefix.length)
-  if (!commandName.length) return;
+  if (!commandName.length || commandName.startsWith("?")) return;
   let commandfile = bot.commands.get(commandName);
   if (commandfile) {
     await commandfile.run(bot, message, args);
