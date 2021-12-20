@@ -1,7 +1,7 @@
 module.exports = async (event, eventMessage) => {
 
   // 2. Get additional required data
-  const totalMemberCount = event.undecidedMembers.length + event.yesMembers.length + event.noMembers.length;
+  const totalMemberCount = event.undecidedMembers.length + event.yesMembers.length + event.noMembers.length + event.waitlistedMembers.length;
 
   let undecidedMembersList = event.undecidedMembers.map(member => member.familyName);
   undecidedMembersList.length ? undecidedMembersList = undecidedMembersList.join(", ") : undecidedMembersList = "good job! no slackers on this event";
@@ -84,13 +84,21 @@ module.exports = async (event, eventMessage) => {
   if (isDefaultNeeded) groupFields.push({ name: "DEFAULT", value: [] });
 
   groupFields.map(field => {
-    groupObj[field.name] ? field.value = `\`\`\`${groupObj[field.name].join(", ")}\`\`\`` : field.value = "```empty```"
+    groupObj[field.name] ? field.value = `\`\`\`${groupObj[field.name].join(", ")}\`\`\`` : field.value = "```empty```";
   });
+
+  let waitlistedMembersList = "empty";
+  console.log(event.waitlistedMembers.length)
+  console.log(event.waitlistedMembers)
+  if (event.waitlistedMembers.length) {
+    waitlistedMembersList = event.waitlistedMembers.map(member => member.familyName).join(", ") || "empty";
+    console.log(waitlistedMembersList)
+  };
 
   let noMembersList = "empty"
   if (event.noMembers.length) {
-    noMembersList = event.noMembers.map(member => member.familyName).join(", ")
-  }
+    noMembersList = event.noMembers.map(member => member.familyName).join(", ") || "empty";
+  };
 
   // 3d. define pa rotation field
   let paGroupsObj = {}
@@ -117,6 +125,8 @@ module.exports = async (event, eventMessage) => {
   groupFields.push({ name: "PA ROTATION", value: `\`\`\`fix\n${paRotation}\`\`\`` });
 
   // 3e. push other fields
+  groupFields.push({ name: "WAITLIST", value: waitlistedMembersList });
+
   groupFields.push({ name: "CAN\'T", value: noMembersList });
 
   groupFields.push({ name: "UNDECIDED", value: undecidedMembersList });

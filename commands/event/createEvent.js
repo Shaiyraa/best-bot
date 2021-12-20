@@ -257,6 +257,7 @@ module.exports = async (bot, message, guildConfig, args) => {
           message: err
         });
         return user.send(err.response.data.message);
+        //return console.log(err);
       };
     };
 
@@ -273,7 +274,6 @@ module.exports = async (bot, message, guildConfig, args) => {
 
     let reactionMap = reactionMessage.reactions.resolve(reaction.emoji.name);
     reactionMap?.users.remove(user.id);
-
   });
 
   // 9. SCHEDULE JOBS FOR ALERT
