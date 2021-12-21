@@ -88,11 +88,8 @@ module.exports = async (event, eventMessage) => {
   });
 
   let waitlistedMembersList = "empty";
-  console.log(event.waitlistedMembers.length)
-  console.log(event.waitlistedMembers)
   if (event.waitlistedMembers.length) {
     waitlistedMembersList = event.waitlistedMembers.map(member => member.familyName).join(", ") || "empty";
-    console.log(waitlistedMembersList)
   };
 
   let noMembersList = "empty"
