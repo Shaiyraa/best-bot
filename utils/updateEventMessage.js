@@ -122,11 +122,11 @@ module.exports = async (event, eventMessage) => {
   groupFields.push({ name: "PA ROTATION", value: `\`\`\`fix\n${paRotation}\`\`\`` });
 
   // 3e. push other fields
-  groupFields.push({ name: "WAITLIST", value: waitlistedMembersList });
+  groupFields.push({ name: "WAITLIST", value: waitlistedMembersList.length > 1024 ? `${waitlistedMembersList.substring(0, 1021)}...` : waitlistedMembersList });
 
-  groupFields.push({ name: "CAN\'T", value: noMembersList });
+  groupFields.push({ name: "CAN\'T", value: noMembersList.length > 1024 ? `${noMembersList.substring(0, 1021)}...` : noMembersList });
 
-  groupFields.push({ name: "UNDECIDED", value: undecidedMembersList });
+  groupFields.push({ name: "UNDECIDED", value: undecidedMembersList.length > 1024 ? `${undecidedMembersList.substring(0, 1021)}...` : undecidedMembersList });
 
   // concat the arrays and put swap embed fields
   let arr = [];
