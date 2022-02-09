@@ -29,8 +29,9 @@ module.exports.run = async (bot, message, args) => {
       break;
     };
     case "archive": {
-      const pastDate = args[1]
-      listArchived(message, guildConfig, pastDate);
+      message.channel.send("This command is currently disabled.")
+      // const pastDate = args[1]
+      // listArchived(message, guildConfig, pastDate);
       break;
     };
     default: {
@@ -62,7 +63,7 @@ module.exports.run = async (bot, message, args) => {
         };
         return reaction.emoji.name === config.advancedUserEmoji
       };
-    
+
       const collector = helpMessage.createReactionCollector(filter, { max: 1, dispose: true });
       collector.on('collect', async (reaction, user) => {
 
@@ -78,9 +79,9 @@ module.exports.run = async (bot, message, args) => {
         ]
 
         const advancedEmbed = new Discord.MessageEmbed()
-        .setTitle("Advanced Options")
-        .setDescription(advancedOptions);
-        
+          .setTitle("Advanced Options")
+          .setDescription(advancedOptions);
+
         // 4. EDIT MESSAGE WITH ADVANCED STUFF
         helpMessage.edit(advancedEmbed);
         helpMessage.reactions.removeAll();

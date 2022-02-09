@@ -69,7 +69,7 @@ module.exports = async (message, guildConfig, familyName, sudo) => {
   // 3. GET USERS HISTORY FROM DB
   let res;
   try {
-    res = await axios.get(`${process.env.API_URL}/api/v1/user-changes?user=${member._id}&limit=10`)
+    res = await axios.get(`${process.env.API_URL}/api/v1/user-changes?user=${member._id}`)
 
     if (!res.data.results) return message.channel.send("No updates were made on this profile yet.")
   } catch (err) {
@@ -92,8 +92,8 @@ module.exports = async (message, guildConfig, familyName, sudo) => {
 
   updates.forEach(update => {
     let date = new Date(update.timestamp)
-    let day = date.getDate() < 10 ? `0${date.getDate()}` : date.getDate();
-    let month = date.getMonth() < 10 ? `0${date.getMonth() + 1}` : date.getMonth() + 1;
+    let day = date.getDate() < 9 ? `0${date.getDate()}` : date.getDate();
+    let month = date.getMonth() < 9 ? `0${date.getMonth() + 1}` : date.getMonth() + 1;
     date = `${day}-${month}-${date.getFullYear()}`;
 
     formattedUpdatesArray.push(`${date.padEnd(13, " ")} ${update.changedField.padEnd(10, " ")} ${update.oldValue.toString().padEnd(7, " ")} ${update.newValue.toString().padEnd(7, " ")}\n`)
